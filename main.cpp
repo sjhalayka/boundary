@@ -40,7 +40,10 @@ int main(int argc, char** argv)
 		}
 	}
 
-	const size_t marching_squares_resolution = 64;
+
+
+
+
 
 	// Get amplitude mask width.
 	template_width = 1.0;
@@ -110,6 +113,10 @@ int main(int argc, char** argv)
 
 	}
 
+
+
+	test_point_index = get_closest_index(test_point);
+
 	// Render the Targa image underneath the associated geometric primitives,
 	// using OpenGL fixed-pipeline functionality.
 	render_image(argc, argv);
@@ -174,21 +181,25 @@ void keyboard_func(unsigned char key, int x, int y)
 	case 'w':
 	{
 		test_point.y += 0.01;
+		test_point_index = get_closest_index(test_point);
 		break;
 	}
 	case 's':
 	{
 		test_point.y -= 0.01;
+		test_point_index = get_closest_index(test_point);
 		break;
 	}
 	case 'a':
 	{
 		test_point.x -= 0.01;
+		test_point_index = get_closest_index(test_point);
 		break;
 	}
 	case 'd':
 	{
 		test_point.x += 0.01;
+		test_point_index = get_closest_index(test_point);
 		break;
 	}
 	default:

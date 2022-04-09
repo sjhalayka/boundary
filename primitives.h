@@ -7,10 +7,10 @@
 class vertex_2
 {
 public:
-	double x;
-	double y;
+	float x;
+	float y;
 
-	vertex_2(const double src_x = 0, const double src_y = 0)
+	vertex_2(const float src_x = 0, const float src_y = 0)
 	{
 		x = src_x;
 		y = src_y;
@@ -49,17 +49,17 @@ public:
 		return temp;
 	}
 
-	inline double dot(const vertex_2 &right) const
+	inline float dot(const vertex_2 &right) const
 	{
 		return x*right.x + y*right.y;
 	}
 
-	inline const double self_dot(void)
+	inline const float self_dot(void)
 	{
 		return x*x + y*y;
 	}
 
-	inline const double length(void)
+	inline const float length(void)
 	{
 		return sqrt(self_dot());
 	}
@@ -70,12 +70,12 @@ class triangle
 public:
 	vertex_2 vertex[3];
 
-	inline double area(void)
+	inline float area(void)
 	{
 		if(vertex[0] == vertex[1] || vertex[0] == vertex[2] || vertex[1] == vertex[2])
 			return 0;
 
-		double a = (vertex[1].x - vertex[0].x)*(vertex[2].y - vertex[0].y) - (vertex[2].x - vertex[0].x)*(vertex[1].y - vertex[0].y);
+		float a = (vertex[1].x - vertex[0].x)*(vertex[2].y - vertex[0].y) - (vertex[2].x - vertex[0].x)*(vertex[1].y - vertex[0].y);
 
 		return 0.5*a;
 	}
@@ -87,7 +87,7 @@ class line_segment
 public:
 	vertex_2 vertex[2];
 
-	double length(void)
+	float length(void)
 	{
 		return sqrt( pow(vertex[0].x - vertex[1].x, 2.0) + pow(vertex[0].y - vertex[1].y, 2.0) );
 	}
