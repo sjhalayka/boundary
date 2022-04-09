@@ -46,9 +46,9 @@ int main(int argc, char** argv)
 
 
 	// Get amplitude mask width.
-	template_width = 1.0;
-	inverse_width = 1.0 / template_width;
-	step_size = template_width / static_cast<double>(marching_squares_resolution - 1);
+	template_width = 1.0f;
+	inverse_width = 1.0f / template_width;
+	step_size = template_width / static_cast<float>(marching_squares_resolution - 1);
 	template_height = step_size * (marching_squares_resolution - 1); // Assumes square image.
 
 	// Get marching squares isovalue.
@@ -56,14 +56,14 @@ int main(int argc, char** argv)
 
 	for (size_t i = 0; i < type_count; i++)
 	{
-		grid_x_min = -template_width / 2.0;
-		grid_y_max = template_height / 2.0;
+		grid_x_min = -template_width * 0.5f;
+		grid_y_max = template_height * 0.5f;
 
 		// Generate geometric primitives using marching squares.
 		grid_square g;
 
-		double grid_x_pos = grid_x_min; // Start at minimum x.
-		double grid_y_pos = grid_y_max; // Start at maximum y.
+		float grid_x_pos = grid_x_min; // Start at minimum x.
+		float grid_y_pos = grid_y_max; // Start at maximum y.
 
 		// Begin march.
 		for (short unsigned int y = 0; y < marching_squares_resolution - 1; y++, grid_y_pos -= step_size, grid_x_pos = grid_x_min)
@@ -180,25 +180,25 @@ void keyboard_func(unsigned char key, int x, int y)
 	{
 	case 'w':
 	{
-		test_point.y += 0.01;
+		test_point.y += 0.01f;
 		test_point_index = get_closest_index(test_point);
 		break;
 	}
 	case 's':
 	{
-		test_point.y -= 0.01;
+		test_point.y -= 0.01f;
 		test_point_index = get_closest_index(test_point);
 		break;
 	}
 	case 'a':
 	{
-		test_point.x -= 0.01;
+		test_point.x -= 0.01f;
 		test_point_index = get_closest_index(test_point);
 		break;
 	}
 	case 'd':
 	{
-		test_point.x += 0.01;
+		test_point.x += 0.01f;
 		test_point_index = get_closest_index(test_point);
 		break;
 	}
@@ -220,10 +220,10 @@ void display_func(void)
 	// Render a dark background.
 	glColor3f(0, 0, 0);
 	glBegin(GL_QUADS);
-		glVertex2f(-template_width/2.0, template_height/2.0);
-		glVertex2f(-template_width/2.0, -template_height/2.0);
-		glVertex2f(template_width/2.0, -template_height/2.0);
-		glVertex2f(template_width/2.0, template_height/2.0);
+		glVertex2f(-template_width*0.5f, template_height * 0.5f);
+		glVertex2f(-template_width * 0.5f, -template_height * 0.5f);
+		glVertex2f(template_width * 0.5f, -template_height * 0.5f);
+		glVertex2f(template_width * 0.5f, template_height * 0.5f);
 	glEnd();
 
 	// Render image area.
@@ -237,9 +237,9 @@ void display_func(void)
 	for (size_t i = 0; i < triangles.size(); i++)
 	{
 		glColor3f(
-			(colours[i].r + 1.0) / 2.0f, 
-			(colours[i].g + 1.0) / 2.0f,
-			(colours[i].b + 1.0) / 2.0f);
+			(colours[i].r + 1.0f) / 2.0f, 
+			(colours[i].g + 1.0f) / 2.0f,
+			(colours[i].b + 1.0f) / 2.0f);
 
 		for (size_t j = 0; j < triangles[i].size(); j++)
 		{

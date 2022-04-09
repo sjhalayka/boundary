@@ -10,12 +10,12 @@ class grid_square
 {
 public:
 	vertex_2 vertex[4];
-	double value[4];
+	float value[4];
 
-	inline vertex_2 vertex_interp(const vertex_2 &p1, const vertex_2 &p2, const double v1, const double v2, const double isovalue)
+	inline vertex_2 vertex_interp(const vertex_2 &p1, const vertex_2 &p2, const float v1, const float v2, const float isovalue)
 	{
 		static vertex_2 temp;
-		static double mu;
+		static float mu;
 
 		// http://local.wasp.uwa.edu.au/~pbourke/geometry/polygonise/
 		mu = (isovalue - v1)/(v2 - v1);
@@ -25,7 +25,7 @@ public:
 		return temp;
 	}
 
-	inline void generate_primitives(vector<line_segment> &line_segments, vector<triangle> &triangles, const double isovalue)
+	inline void generate_primitives(vector<line_segment> &line_segments, vector<triangle> &triangles, const float isovalue)
 	{
 		// Identify which of the 4 corners of the square are within the isosurface.
 		// Max 16 cases. Only 14 cases produce triangles and image edge line segments.

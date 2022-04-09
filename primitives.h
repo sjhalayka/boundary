@@ -77,7 +77,7 @@ public:
 
 		float a = (vertex[1].x - vertex[0].x)*(vertex[2].y - vertex[0].y) - (vertex[2].x - vertex[0].x)*(vertex[1].y - vertex[0].y);
 
-		return 0.5*a;
+		return 0.5f*a;
 	}
 };
 
@@ -89,7 +89,7 @@ public:
 
 	float length(void)
 	{
-		return sqrt( pow(vertex[0].x - vertex[1].x, 2.0) + pow(vertex[0].y - vertex[1].y, 2.0) );
+		return sqrtf( pow(vertex[0].x - vertex[1].x, 2.0f) + pow(vertex[0].y - vertex[1].y, 2.0f) );
 	}
 };
 

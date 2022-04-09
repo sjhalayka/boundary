@@ -33,8 +33,8 @@ void keyboard_func(unsigned char key, int x, int y);
 // OpenGL viewport parameters.
 GLint win_id = 0;
 GLint win_x = 640, win_y = 480;
-GLfloat camera_z = 1.25;
-float background_colour = 0.33;
+GLfloat camera_z = 1.25f;
+float background_colour = 0.33f;
 
 
 const size_t marching_squares_resolution = 128;
@@ -75,7 +75,7 @@ size_t get_closest_index(const vertex_2 v)
 			float distance = ls.length();
 
 			if(distance != 0)
-				total_distance += 1.0f / pow(distance, pow_factor);
+				total_distance += 1.0f / powf(distance, pow_factor);
 		}
 
 		distance_index_map[total_distance] = i;
@@ -108,9 +108,9 @@ float get_value(const size_t index, const vertex_2 v)
 			if (distance != 0)
 			{
 				if (index == i)
-					running_value += 1.0 / pow(distance, pow_factor);
+					running_value += 1.0f / powf(distance, pow_factor);
 				else
-					running_value -= 1.0 / pow(distance, pow_factor);
+					running_value -= 1.0f / powf(distance, pow_factor);
 			}
 		}
 	}
