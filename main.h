@@ -1,7 +1,6 @@
 #ifndef MS_H
 #define MS_H
 
-#include "image.h"
 #include "primitives.h"
 #include "marching_squares.h"
 
@@ -12,14 +11,13 @@ using std::vector;
 using std::cout;
 using std::endl;
 
-#include <sstream>
-using std::istringstream;
 
 
 void render_image(int &argc, char ** &argv);
 void idle_func(void);
 void reshape_func(int width, int height);
 void display_func(void);
+void keyboard_func(unsigned char key, int x, int y);
 
 
 // g++ *.cpp -framework GLUT -framework OpenGL
@@ -31,7 +29,7 @@ void display_func(void);
 
 // OpenGL viewport parameters.
 GLint win_id = 0;
-GLint win_x = 800, win_y = 800;
+GLint win_x = 640, win_y = 480;
 GLfloat camera_z = 1.25;
 double background_colour = 0.33;
 
@@ -53,6 +51,8 @@ vector<vector<triangle>> triangles;
 vector<colour_3> colours;
 
 
+vertex_2 test_point(0, 0);
+size_t test_point_index = 0;
 
 
 float get_value(const size_t index, const vertex_2 v)

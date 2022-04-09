@@ -128,6 +128,7 @@ void render_image(int &argc, char ** &argv)
 	glutIdleFunc(idle_func);
 	glutReshapeFunc(reshape_func);
 	glutDisplayFunc(display_func);
+	glutKeyboardFunc(keyboard_func);
 
 	glShadeModel(GL_FLAT);
 	glClearColor(background_colour, background_colour, background_colour, 1);
@@ -164,6 +165,35 @@ void reshape_func(int width, int height)
 	glLoadIdentity();
 	gluPerspective(45.0f, static_cast<GLfloat>(win_x)/static_cast<GLfloat>(win_y), 0.1, 10);
 	gluLookAt(0, 0, camera_z, 0, 0, 0, 0, 1, 0);
+}
+
+void keyboard_func(unsigned char key, int x, int y)
+{
+	switch (tolower(key))
+	{
+	case 'w':
+	{
+		test_point.y += 0.01;
+		break;
+	}
+	case 's':
+	{
+		test_point.y -= 0.01;
+		break;
+	}
+	case 'a':
+	{
+		test_point.x -= 0.01;
+		break;
+	}
+	case 'd':
+	{
+		test_point.x += 0.01;
+		break;
+	}
+	default:
+		break;
+	}
 }
 
 // Visualization.
@@ -256,6 +286,10 @@ void display_func(void)
 			glVertex2f(train_points[i][j].x, train_points[i][j].y);
 		}
 	}
+
+	glColor3f(colours[test_point_index].r, colours[test_point_index].g, colours[test_point_index].b);
+	glVertex2f(test_point.x, test_point.y);
+
 	glEnd();
 
 	glFlush();
