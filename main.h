@@ -38,7 +38,7 @@ float background_colour = 0.33f;
 
 bool do_border = false;
 const size_t type_count = 2;
-const size_t marching_squares_resolution = 8; // Minimum is 3
+const size_t marching_squares_resolution = 32; // Minimum is 3
 
 float template_width = 1;
 float template_height = 0;
@@ -64,6 +64,30 @@ bool ray_intersects_triangle(
 	const vertex_3& v0, const vertex_3& v1, const vertex_3& v2,
 	float& t)
 {
+	// Triangles exist in the z = 0 plane
+
+	float smallest_x = FLT_MAX;
+	float smallest_y = FLT_MAX;
+	float greatest_x = -FLT_MAX;
+	float greatest_y = -FLT_MAX;
+
+	if (v0.x > greatest_x) greatest_x = v0.x;
+	if (v1.x > greatest_x) greatest_x = v1.x;
+	if (v2.x > greatest_x) greatest_x = v2.x;
+	if (v0.x < smallest_x) smallest_x = v0.x;
+	if (v1.x < smallest_x) smallest_x = v1.x;
+	if (v2.x < smallest_x) smallest_x = v2.x;
+	if (v0.y > greatest_y) greatest_y = v0.y;
+	if (v1.y > greatest_y) greatest_y = v1.y;
+	if (v2.y > greatest_y) greatest_y = v2.y;
+	if (v0.y < smallest_y) smallest_y = v0.y;
+	if (v1.y < smallest_y) smallest_y = v1.y;
+	if (v2.y < smallest_y) smallest_y = v2.y;
+
+	// Point lies outside of the triangle's bounding box
+	if (orig.x < smallest_x || orig.x > greatest_x || orig.y < smallest_y || orig.y > greatest_y)
+		return false;
+
 	// compute plane's normal
 	vertex_3 v0v1 = v1 - v0;
 	vertex_3 v0v2 = v2 - v0;
@@ -117,7 +141,7 @@ bool ray_intersects_triangle(
 bool ray_intersects_triangle_vector(size_t index)
 {
 	const vertex_3 origin(test_point.x, test_point.y, 0);
-	const vertex_3 ray(test_point.x, test_point.y, 1);
+	const vertex_3 ray(test_point.x, test_point.y, -1);
 
 	for (size_t i = 0; i < triangles[index].size(); i++)
 	{

@@ -39,20 +39,20 @@ int main(int argc, char** argv)
 			x *= template_width;
 			y *= template_width;
 
-			if (i == 0)
-			{
-				if (y < 0)
-				{
-					y = -y;
-				}
-			}
-			else
-			{
-				if (y > 0)
-				{
-					y = -y;
-				}
-			}
+			//if (i == 0)
+			//{
+			//	if (y < 0)
+			//	{
+			//		y = -y;
+			//	}
+			//}
+			//else
+			//{
+			//	if (y > 0)
+			//	{
+			//		y = -y;
+			//	}
+			//}
 					
 
 			vertex_2 v;
