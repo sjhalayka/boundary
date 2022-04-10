@@ -39,6 +39,22 @@ int main(int argc, char** argv)
 			x *= template_width;
 			y *= template_width;
 
+			if (i == 0)
+			{
+				if (y < 0)
+				{
+					y = -y;
+				}
+			}
+			else
+			{
+				if (y > 0)
+				{
+					y = -y;
+				}
+			}
+					
+
 			vertex_2 v;
 			v.x = x;
 			v.y = y;
@@ -79,28 +95,31 @@ int main(int argc, char** argv)
 				g.value[2] = get_value(i, g.vertex[2]);
 				g.value[3] = get_value(i, g.vertex[3]);
 
-				if (x == 0)
+				if (do_border)
 				{
-					g.value[0] = -FLT_MAX;
-					g.value[1] = -FLT_MAX;
-				}
+					if (x == 0)
+					{
+						g.value[0] = -FLT_MAX;
+						g.value[1] = -FLT_MAX;
+					}
 
-				if (x == marching_squares_resolution - 2)
-				{
-					g.value[2] = -FLT_MAX;
-					g.value[3] = -FLT_MAX;
-				}
+					if (x == marching_squares_resolution - 2)
+					{
+						g.value[2] = -FLT_MAX;
+						g.value[3] = -FLT_MAX;
+					}
 
-				if (y == 0)
-				{
-					g.value[0] = -FLT_MAX;
-					g.value[3] = -FLT_MAX;
-				}
+					if (y == 0)
+					{
+						g.value[0] = -FLT_MAX;
+						g.value[3] = -FLT_MAX;
+					}
 
-				if (y == marching_squares_resolution - 2)
-				{
-					g.value[1] = -FLT_MAX;
-					g.value[2] = -FLT_MAX;
+					if (y == marching_squares_resolution - 2)
+					{
+						g.value[1] = -FLT_MAX;
+						g.value[2] = -FLT_MAX;
+					}
 				}
 
 				g.generate_primitives(line_segments[i], triangles[i], isovalue);
@@ -109,9 +128,16 @@ int main(int argc, char** argv)
 
 	}
 
+	for (size_t i = 0; i < type_count; i++)
+	{
+		if(ray_intersects_triangle_vector(i))
+		{
+			test_point_index = i;
+			//break;
+		}
+	}
 
-
-	test_point_index = get_closest_index(test_point);
+	//test_point_index = get_closest_index(test_point);
 
 	// Render the Targa image underneath the associated geometric primitives,
 	// using OpenGL fixed-pipeline functionality.
@@ -177,25 +203,62 @@ void keyboard_func(unsigned char key, int x, int y)
 	case 'w':
 	{
 		test_point.y += 0.01f;
-		test_point_index = get_closest_index(test_point);
+		//test_point_index = get_closest_index(test_point);
+		
+		for (size_t i = 0; i < type_count; i++)
+		{
+			if (ray_intersects_triangle_vector(i))
+			{
+				test_point_index = i;
+				//break;
+			}
+		}
+
 		break;
 	}
 	case 's':
 	{
 		test_point.y -= 0.01f;
-		test_point_index = get_closest_index(test_point);
+		//test_point_index = get_closest_index(test_point);
+
+		for (size_t i = 0; i < type_count; i++)
+		{
+			if (ray_intersects_triangle_vector(i))
+			{
+				test_point_index = i;
+				//break;
+			}
+		}
 		break;
 	}
 	case 'a':
 	{
 		test_point.x -= 0.01f;
-		test_point_index = get_closest_index(test_point);
+		//test_point_index = get_closest_index(test_point);
+
+		for (size_t i = 0; i < type_count; i++)
+		{
+			if (ray_intersects_triangle_vector(i))
+			{
+				test_point_index = i;
+				//break;
+			}
+		}
 		break;
 	}
 	case 'd':
 	{
 		test_point.x += 0.01f;
-		test_point_index = get_closest_index(test_point);
+		//test_point_index = get_closest_index(test_point);
+
+		for (size_t i = 0; i < type_count; i++)
+		{
+			if (ray_intersects_triangle_vector(i))
+			{
+				test_point_index = i;
+				//break;
+			}
+		}
 		break;
 	}
 	default:
@@ -245,6 +308,37 @@ void display_func(void)
 		}
 	}
 	glEnd();
+
+
+	glBegin(GL_LINES);
+
+	for (size_t i = 0; i < triangles.size(); i++)
+	{
+		glColor3f(
+			(colours[i].r),
+			(colours[i].g),
+			(colours[i].b));
+
+		for (size_t j = 0; j < triangles[i].size(); j++)
+		{
+			glVertex2f(triangles[i][j].vertex[0].x, triangles[i][j].vertex[0].y);
+			glVertex2f(triangles[i][j].vertex[1].x, triangles[i][j].vertex[1].y);
+
+			glVertex2f(triangles[i][j].vertex[1].x, triangles[i][j].vertex[1].y);
+			glVertex2f(triangles[i][j].vertex[2].x, triangles[i][j].vertex[2].y);
+
+			glVertex2f(triangles[i][j].vertex[2].x, triangles[i][j].vertex[2].y);
+			glVertex2f(triangles[i][j].vertex[0].x, triangles[i][j].vertex[0].y);
+
+		}
+	}
+	glEnd();
+
+
+
+
+
+
 
 	// Render image outline edge length.
 	glLineWidth(2);
