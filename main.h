@@ -37,9 +37,9 @@ GLfloat camera_z = 1.25f;
 float background_colour = 0.33f;
 
 
-const size_t marching_squares_resolution = 128;
-float pow_factor = 10.0f;
-float template_width = 0;
+const size_t marching_squares_resolution = 64;
+float pow_factor = 10;
+float template_width = 1;
 float template_height = 0;
 float step_size = 0;
 float isovalue = 0;

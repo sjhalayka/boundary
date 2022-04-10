@@ -5,6 +5,10 @@ int main(int argc, char** argv)
 {
 	srand(123);
 
+	inverse_width = 1.0f / template_width;
+	step_size = template_width / static_cast<float>(marching_squares_resolution - 1);
+	template_height = step_size * (marching_squares_resolution - 1);
+
 	train_points.clear();
 	line_segments.clear();
 	triangles.clear();
@@ -32,6 +36,9 @@ int main(int argc, char** argv)
 			x -= 0.5f;
 			y -= 0.5f;
 
+			x *= template_width;
+			y *= template_width;
+
 			vertex_2 v;
 			v.x = x;
 			v.y = y;
@@ -42,17 +49,6 @@ int main(int argc, char** argv)
 
 
 
-
-
-
-	// Get amplitude mask width.
-	template_width = 1.0f;
-	inverse_width = 1.0f / template_width;
-	step_size = template_width / static_cast<float>(marching_squares_resolution - 1);
-	template_height = step_size * (marching_squares_resolution - 1); // Assumes square image.
-
-	// Get marching squares isovalue.
-	isovalue = 0;
 
 	for (size_t i = 0; i < type_count; i++)
 	{
@@ -85,26 +81,26 @@ int main(int argc, char** argv)
 
 				if (x == 0)
 				{
-					g.value[0] = -1;
-					g.value[1] = -1;
+					g.value[0] = -FLT_MAX;
+					g.value[1] = -FLT_MAX;
 				}
 
 				if (x == marching_squares_resolution - 2)
 				{
-					g.value[2] = -1;
-					g.value[3] = -1;
+					g.value[2] = -FLT_MAX;
+					g.value[3] = -FLT_MAX;
 				}
 
 				if (y == 0)
 				{
-					g.value[0] = -1;
-					g.value[3] = -1;
+					g.value[0] = -FLT_MAX;
+					g.value[3] = -FLT_MAX;
 				}
 
 				if (y == marching_squares_resolution - 2)
 				{
-					g.value[1] = -1;
-					g.value[2] = -1;
+					g.value[1] = -FLT_MAX;
+					g.value[2] = -FLT_MAX;
 				}
 
 				g.generate_primitives(line_segments[i], triangles[i], isovalue);
