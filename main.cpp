@@ -128,16 +128,11 @@ int main(int argc, char** argv)
 
 	}
 
-	for (size_t i = 0; i < type_count; i++)
+	if (false == get_index(test_point_index))
 	{
-		if(ray_intersects_triangle_vector(i))
-		{
-			test_point_index = i;
-			//break;
-		}
+		cout << "black" << endl;
+		test_point_index = get_closest_index(test_point);
 	}
-
-	//test_point_index = get_closest_index(test_point);
 
 	// Render the Targa image underneath the associated geometric primitives,
 	// using OpenGL fixed-pipeline functionality.
@@ -203,62 +198,37 @@ void keyboard_func(unsigned char key, int x, int y)
 	case 'w':
 	{
 		test_point.y += 0.01f;
-		//test_point_index = get_closest_index(test_point);
-		
-		for (size_t i = 0; i < type_count; i++)
-		{
-			if (ray_intersects_triangle_vector(i))
-			{
-				test_point_index = i;
-				//break;
-			}
-		}
+
+		if (false == get_index(test_point_index))
+			test_point_index = get_closest_index(test_point);
 
 		break;
 	}
 	case 's':
 	{
 		test_point.y -= 0.01f;
-		//test_point_index = get_closest_index(test_point);
 
-		for (size_t i = 0; i < type_count; i++)
-		{
-			if (ray_intersects_triangle_vector(i))
-			{
-				test_point_index = i;
-				//break;
-			}
-		}
+		if (false == get_index(test_point_index))
+			test_point_index = get_closest_index(test_point);
+
 		break;
 	}
 	case 'a':
 	{
 		test_point.x -= 0.01f;
-		//test_point_index = get_closest_index(test_point);
 
-		for (size_t i = 0; i < type_count; i++)
-		{
-			if (ray_intersects_triangle_vector(i))
-			{
-				test_point_index = i;
-				//break;
-			}
-		}
+		if (false == get_index(test_point_index))
+			test_point_index = get_closest_index(test_point);
+
 		break;
 	}
 	case 'd':
 	{
 		test_point.x += 0.01f;
-		//test_point_index = get_closest_index(test_point);
 
-		for (size_t i = 0; i < type_count; i++)
-		{
-			if (ray_intersects_triangle_vector(i))
-			{
-				test_point_index = i;
-				//break;
-			}
-		}
+		if (false == get_index(test_point_index))
+			test_point_index = get_closest_index(test_point);
+
 		break;
 	}
 	default:

@@ -37,7 +37,7 @@ GLfloat camera_z = 1.25f;
 float background_colour = 0.33f;
 
 bool do_border = false;
-const size_t type_count = 2;
+const size_t type_count = 4;
 const size_t marching_squares_resolution = 32; // Minimum is 3
 
 float template_width = 1;
@@ -57,6 +57,10 @@ vector<colour_3> colours;
 
 vertex_2 test_point(0, 0);
 size_t test_point_index = 0;
+
+
+
+
 
 
 bool ray_intersects_triangle(
@@ -84,7 +88,7 @@ bool ray_intersects_triangle(
 	if (v1.y < smallest_y) smallest_y = v1.y;
 	if (v2.y < smallest_y) smallest_y = v2.y;
 
-	// Point lies outside of the triangle's bounding box
+	// Point lies outside of the triangle's bounding square
 	if (orig.x < smallest_x || orig.x > greatest_x || orig.y < smallest_y || orig.y > greatest_y)
 		return false;
 
@@ -169,39 +173,52 @@ bool ray_intersects_triangle_vector(size_t index)
 	return false;
 }
 
+bool get_index(size_t &out)
+{
+	for (size_t i = 0; i < type_count; i++)
+	{
+		if (ray_intersects_triangle_vector(i))
+		{
+			out = i;
+			return true;
+		}
+	}
+
+	return false;
+}
 
 
-//
-//size_t get_closest_index(const vertex_2 v)
-//{
-//	map<float, size_t> distance_index_map;
-//
-//	for (size_t i = 0; i < type_count; i++)
-//	{
-//		float total_distance = 0;
-//
-//		for (size_t j = 0; j < train_points[i].size(); j++)
-//		{
-//			line_segment ls;
-//			ls.vertex[0] = v;
-//			ls.vertex[1] = train_points[i][j];
-//
-//			float distance = ls.length();
-//
-//			if(distance != 0)
-//				total_distance += 1.0f / powf(distance, pow_factor);
-//		}
-//
-//		distance_index_map[total_distance] = i;
-//	}
-//
-//	map<float, size_t>::reverse_iterator ci = distance_index_map.rbegin();
-//
-//	float closest_distance = ci->first;
-//	size_t closest_index = ci->second;
-//
-//	return closest_index;
-//}
+
+size_t get_closest_index(const vertex_2 v)
+{
+	map<float, size_t> distance_index_map;
+
+	for (size_t i = 0; i < type_count; i++)
+	{
+		float total_distance = 0;
+
+		for (size_t j = 0; j < train_points[i].size(); j++)
+		{
+			line_segment ls;
+			ls.vertex[0] = v;
+			ls.vertex[1] = train_points[i][j];
+
+			float distance = ls.length();
+
+			if(distance != 0)
+				total_distance += 1.0f / distance;
+		}
+
+		distance_index_map[total_distance] = i;
+	}
+
+	map<float, size_t>::reverse_iterator ci = distance_index_map.rbegin();
+
+	float closest_distance = ci->first;
+	size_t closest_index = ci->second;
+
+	return closest_index;
+}
 
 
 
