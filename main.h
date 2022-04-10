@@ -38,8 +38,8 @@ float background_colour = 0.33f;
 
 bool do_border = false;
 const size_t type_count = 2;
-const size_t marching_squares_resolution = 3;
-float pow_factor = 10;
+const size_t marching_squares_resolution = 8; // Minimum is 3
+
 float template_width = 1;
 float template_height = 0;
 float step_size = 0;
@@ -57,6 +57,7 @@ vector<colour_3> colours;
 
 vertex_2 test_point(0, 0);
 size_t test_point_index = 0;
+
 
 bool ray_intersects_triangle(
 	const vertex_3 & orig, const vertex_3& dir,
@@ -135,13 +136,10 @@ bool ray_intersects_triangle_vector(size_t index)
 			triangles[index][i].vertex[2].y,
 			0);
 
-		float out;
+		float out = 0;
 
 		if (ray_intersects_triangle(origin, ray, v0, v1, v2, out))
-		{
-			cout << "found hit " << index << endl;
 			return true;
-		}
 	}
 
 	return false;
@@ -200,9 +198,9 @@ float get_value(const size_t index, const vertex_2 v)
 			if (distance != 0)
 			{
 				if (index == i)
-					running_value += 1.0f / powf(distance, pow_factor);
+					running_value += 1.0f / distance;
 				else
-					running_value -= 1.0f / powf(distance, pow_factor);
+					running_value -= 1.0f / distance;
 			}
 		}
 	}
