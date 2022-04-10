@@ -129,10 +129,7 @@ int main(int argc, char** argv)
 	}
 
 	if (false == get_index(test_point_index))
-	{
-		cout << "black" << endl;
 		test_point_index = get_closest_index(test_point);
-	}
 
 	// Render the Targa image underneath the associated geometric primitives,
 	// using OpenGL fixed-pipeline functionality.

@@ -37,7 +37,7 @@ GLfloat camera_z = 1.25f;
 float background_colour = 0.33f;
 
 bool do_border = false;
-const size_t type_count = 4;
+const size_t type_count = 2;
 const size_t marching_squares_resolution = 32; // Minimum is 3
 
 float template_width = 1;
