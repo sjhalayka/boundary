@@ -3,7 +3,7 @@
 // Cat image from: http://www.iacuc.arizona.edu/training/cats/index.html
 int main(int argc, char** argv)
 {
-	srand(123);
+	srand(123456);
 
 	inverse_width = 1.0f / template_width;
 	step_size = template_width / static_cast<float>(marching_squares_resolution - 1);
@@ -39,20 +39,20 @@ int main(int argc, char** argv)
 			x *= template_width;
 			y *= template_width;
 
-			//if (i == 0)
-			//{
-			//	if (y < 0)
-			//	{
-			//		y = -y;
-			//	}
-			//}
-			//else
-			//{
-			//	if (y > 0)
-			//	{
-			//		y = -y;
-			//	}
-			//}
+			if (i == 0)
+			{
+				if (y < 0)
+				{
+					y = -y;
+				}
+			}
+			else
+			{
+				if (y > 0)
+				{
+					y = -y;
+				}
+			}
 					
 
 			vertex_2 v;

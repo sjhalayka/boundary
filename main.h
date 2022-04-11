@@ -38,7 +38,7 @@ float background_colour = 0.33f;
 
 bool do_border = false;
 const size_t type_count = 2;
-const size_t marching_squares_resolution = 32; // Minimum is 3
+const size_t marching_squares_resolution = 2; // Minimum is 2
 
 float template_width = 1;
 float template_height = 0;
