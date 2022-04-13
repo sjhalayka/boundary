@@ -93,12 +93,9 @@ void merge_contours(vector<contour> &c, vector<contour> &fc)
 		for (size_t i = 0; i < c.size() - 1; i++)
 		{
 			vertex_2 first0 = c[i].d[0].vertex[0];
-			vertex_2 first1 = c[i].d[0].vertex[1];
-			vertex_2 last0 = c[i].d[c[i].d.size() - 1].vertex[0];
 			vertex_2 last1 = c[i].d[c[i].d.size() - 1].vertex[1];
 
-			if (first_end_vertex == first0 || first_end_vertex == first1 ||
-				first_end_vertex == last0 || first_end_vertex == last1)
+			if (first_end_vertex == first0 || first_end_vertex == last1)
 			{
 				// found match, prepend data
 				cout << "prepend data" << endl;
@@ -110,8 +107,7 @@ void merge_contours(vector<contour> &c, vector<contour> &fc)
 
 				return;
 			}
-			else if (last_end_vertex == first0 || last_end_vertex == first1 ||
-					last_end_vertex == last0 || last_end_vertex == last1)
+			else if (last_end_vertex == first0 || last_end_vertex == last1)
 			{
 				// found match, append data
 				cout << "append data" << endl;
@@ -123,8 +119,9 @@ void merge_contours(vector<contour> &c, vector<contour> &fc)
 
 				return;
 			}
-
 		}
+
+
 
 		// no match found
 		fc.push_back(c[c.size() - 1]);
@@ -132,22 +129,6 @@ void merge_contours(vector<contour> &c, vector<contour> &fc)
 
 		return;
 
-
-	//		else
-	//		{
-	///*			fc.push_back(c[c.size() - 1]);
-	//			c.erase(c.begin() + i);
-
-	//			return;*/
-	//			cout << "argh" << endl;
-	//			cout << first_end_vertex.x << " " << first_end_vertex.y << endl;
-	//			cout << last_end_vertex.x << " " << last_end_vertex.y << endl;
-
-	//			cout << first0.x << " " << first0.y << endl;
-	//			cout << first1.x << " " << first1.y << endl;
-	//			cout << last0.x << " " << last0.y << endl;
-	//			cout << last1.x << " " << last1.y << endl;
-	//		}
 
 
 	}

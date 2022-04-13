@@ -143,9 +143,7 @@ int main(int argc, char** argv)
 	cout << contours.size() << endl;
 
 	while (contours.size() > 0)
-	{
 		merge_contours(contours, final_contours);
-	}
 
 	cout << final_contours.size() << endl;
 	
