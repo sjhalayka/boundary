@@ -12,10 +12,21 @@ public:
 	vertex_2 vertex[4];
 	float value[4];
 
-	inline vertex_2 vertex_interp(const vertex_2 &p1, const vertex_2 &p2, const float v1, const float v2, const float isovalue)
+	inline vertex_2 vertex_interp(vertex_2 p1, vertex_2 p2, float v1, float v2, const float isovalue)
 	{
-		static vertex_2 temp;
-		static float mu;
+		if (p2 < p1)
+		{
+			vertex_2 tp = p1;
+			p1 = p2;
+			p2 = tp;
+
+			float tv = v1;
+			v1 = v2;
+			v2 = tv;
+		}
+
+		vertex_2 temp;
+		float mu;
 
 		// http://local.wasp.uwa.edu.au/~pbourke/geometry/polygonise/
 		mu = (isovalue - v1)/(v2 - v1);

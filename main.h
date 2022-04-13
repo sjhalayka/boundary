@@ -14,6 +14,17 @@ using std::map;
 using std::cout;
 using std::endl;
 
+#include <deque>
+using std::deque;
+
+
+class contour
+{
+public:
+	deque<line_segment> d;
+};
+
+
 
 
 void render_image(int &argc, char ** &argv);
@@ -38,7 +49,7 @@ float background_colour = 0.33f;
 
 bool do_border = false;
 const size_t type_count = 2;
-const size_t marching_squares_resolution = 2; // Minimum is 2
+const size_t marching_squares_resolution = 32; // Minimum is 2
 
 float template_width = 1;
 float template_height = 0;
@@ -51,6 +62,97 @@ float grid_y_max = 0;
 
 vector<vector<vertex_2>> train_points;
 vector<vector<line_segment>> line_segments;
+
+// Only one of these are needed, because we are using type count = 2
+vector<contour> contours;
+vector<contour> final_contours;
+
+void merge_contours(vector<contour> &c, vector<contour> &fc)
+{
+	if (c.size() == 1)
+	{
+		fc.push_back(c[0]);
+		c.pop_back();
+		return;
+	}
+
+	vertex_2 first_end_vertex = c[c.size() - 1].d[0].vertex[0];
+	vertex_2 last_end_vertex = c[c.size() - 1].d[c[c.size() - 1].d.size() - 1].vertex[1];
+
+	if (first_end_vertex == last_end_vertex)
+	{
+		cout << "Closed loop" << endl;
+		fc.push_back(c[c.size() - 1]);
+		c.pop_back();
+		return;
+	}
+	else
+	{
+		cout << "not a closed loop" << endl;
+
+		for (size_t i = 0; i < c.size() - 1; i++)
+		{
+			vertex_2 first0 = c[i].d[0].vertex[0];
+			vertex_2 first1 = c[i].d[0].vertex[1];
+			vertex_2 last0 = c[i].d[c[i].d.size() - 1].vertex[0];
+			vertex_2 last1 = c[i].d[c[i].d.size() - 1].vertex[1];
+
+			if (first_end_vertex == first0 || first_end_vertex == first1 ||
+				first_end_vertex == last0 || first_end_vertex == last1)
+			{
+				// found match, prepend data
+				cout << "prepend data" << endl;
+
+				for (size_t j = 0; j < c[i].d.size(); j++)
+					c[c.size() - 1].d.push_front(c[i].d[j]);
+
+				c.erase(c.begin() + i);
+
+				return;
+			}
+			else if (last_end_vertex == first0 || last_end_vertex == first1 ||
+					last_end_vertex == last0 || last_end_vertex == last1)
+			{
+				// found match, append data
+				cout << "append data" << endl;
+
+				for (size_t j = 0; j < c[i].d.size(); j++)
+					c[c.size() - 1].d.push_back(c[i].d[j]);
+
+				c.erase(c.begin() + i);
+
+				return;
+			}
+
+		}
+
+		// no match found
+		fc.push_back(c[c.size() - 1]);
+		c.pop_back();
+
+		return;
+
+
+	//		else
+	//		{
+	///*			fc.push_back(c[c.size() - 1]);
+	//			c.erase(c.begin() + i);
+
+	//			return;*/
+	//			cout << "argh" << endl;
+	//			cout << first_end_vertex.x << " " << first_end_vertex.y << endl;
+	//			cout << last_end_vertex.x << " " << last_end_vertex.y << endl;
+
+	//			cout << first0.x << " " << first0.y << endl;
+	//			cout << first1.x << " " << first1.y << endl;
+	//			cout << last0.x << " " << last0.y << endl;
+	//			cout << last1.x << " " << last1.y << endl;
+	//		}
+
+
+	}
+}
+
 vector<vector<triangle>> triangles;
 vector<colour_3> colours;
 

@@ -39,20 +39,20 @@ int main(int argc, char** argv)
 			x *= template_width;
 			y *= template_width;
 
-			if (i == 0)
-			{
-				if (y < 0)
-				{
-					y = -y;
-				}
-			}
-			else
-			{
-				if (y > 0)
-				{
-					y = -y;
-				}
-			}
+			//if (i == 0)
+			//{
+			//	if (y < 0)
+			//	{
+			//		y = -y;
+			//	}
+			//}
+			//else
+			//{
+			//	if (y > 0)
+			//	{
+			//		y = -y;
+			//	}
+			//}
 					
 
 			vertex_2 v;
@@ -131,8 +131,28 @@ int main(int argc, char** argv)
 	if (false == get_index(test_point_index))
 		test_point_index = get_closest_index(test_point);
 
-	// Render the Targa image underneath the associated geometric primitives,
-	// using OpenGL fixed-pipeline functionality.
+	for (size_t i = 0; i < line_segments[0].size(); i++)
+	{
+		contour c;
+		line_segment ls = line_segments[0][i];
+
+		c.d.push_back(ls);
+		contours.push_back(c);
+	}
+
+	cout << contours.size() << endl;
+
+	while (contours.size() > 0)
+	{
+		merge_contours(contours, final_contours);
+	}
+
+	cout << final_contours.size() << endl;
+	
+
+
+
+
 	render_image(argc, argv);
 
 	return 0;
@@ -277,53 +297,70 @@ void display_func(void)
 	glEnd();
 
 
-	glBegin(GL_LINES);
+	//glBegin(GL_LINES);
 
-	for (size_t i = 0; i < triangles.size(); i++)
-	{
-		glColor3f(
-			(colours[i].r),
-			(colours[i].g),
-			(colours[i].b));
+	//for (size_t i = 0; i < triangles.size(); i++)
+	//{
+	//	glColor3f(
+	//		(colours[i].r),
+	//		(colours[i].g),
+	//		(colours[i].b));
 
-		for (size_t j = 0; j < triangles[i].size(); j++)
-		{
-			glVertex2f(triangles[i][j].vertex[0].x, triangles[i][j].vertex[0].y);
-			glVertex2f(triangles[i][j].vertex[1].x, triangles[i][j].vertex[1].y);
+	//	for (size_t j = 0; j < triangles[i].size(); j++)
+	//	{
+	//		glVertex2f(triangles[i][j].vertex[0].x, triangles[i][j].vertex[0].y);
+	//		glVertex2f(triangles[i][j].vertex[1].x, triangles[i][j].vertex[1].y);
 
-			glVertex2f(triangles[i][j].vertex[1].x, triangles[i][j].vertex[1].y);
-			glVertex2f(triangles[i][j].vertex[2].x, triangles[i][j].vertex[2].y);
+	//		glVertex2f(triangles[i][j].vertex[1].x, triangles[i][j].vertex[1].y);
+	//		glVertex2f(triangles[i][j].vertex[2].x, triangles[i][j].vertex[2].y);
 
-			glVertex2f(triangles[i][j].vertex[2].x, triangles[i][j].vertex[2].y);
-			glVertex2f(triangles[i][j].vertex[0].x, triangles[i][j].vertex[0].y);
+	//		glVertex2f(triangles[i][j].vertex[2].x, triangles[i][j].vertex[2].y);
+	//		glVertex2f(triangles[i][j].vertex[0].x, triangles[i][j].vertex[0].y);
 
-		}
-	}
-	glEnd();
-
-
+	//	}
+	//}
+	//glEnd();
 
 
 
-
-
-	// Render image outline edge length.
 	glLineWidth(2);
 	glBegin(GL_LINES);
 
-	for(size_t i = 0; i < line_segments.size(); i++)
-	{
-		glColor3f(colours[i].r, colours[i].g, colours[i].b);
+	srand(123);
 
-		for (size_t j = 0; j < line_segments[i].size(); j++)
+	for (size_t i = 0; i < final_contours.size(); i++)
+	{
+		glColor3f(static_cast <float> (rand()) / static_cast <float> (RAND_MAX), static_cast <float> (rand()) / static_cast <float> (RAND_MAX), static_cast <float> (rand()) / static_cast <float> (RAND_MAX));// colours[i].r, colours[i].g, colours[i].b);
+
+		for (size_t j = 0; j < final_contours[i].d.size(); j++)
 		{
-			glVertex2f(line_segments[i][j].vertex[0].x, line_segments[i][j].vertex[0].y);
-			glVertex2f(line_segments[i][j].vertex[1].x, line_segments[i][j].vertex[1].y);
+			glVertex2f(final_contours[i].d[j].vertex[0].x, final_contours[i].d[j].vertex[0].y);
+			glVertex2f(final_contours[i].d[j].vertex[1].x, final_contours[i].d[j].vertex[1].y);
 		}
 	}
 
 	glEnd();
 	glLineWidth(1);
+
+
+
+	// Render image outline edge length.
+	//glLineWidth(2);
+	//glBegin(GL_LINES);
+
+	//for(size_t i = 0; i < line_segments.size(); i++)
+	//{
+	//	glColor3f(colours[i].r, colours[i].g, colours[i].b);
+
+	//	for (size_t j = 0; j < line_segments[i].size(); j++)
+	//	{
+	//		glVertex2f(line_segments[i][j].vertex[0].x, line_segments[i][j].vertex[0].y);
+	//		glVertex2f(line_segments[i][j].vertex[1].x, line_segments[i][j].vertex[1].y);
+	//	}
+	//}
+
+	//glEnd();
+	//glLineWidth(1);
 
 
 	glPointSize(12);
