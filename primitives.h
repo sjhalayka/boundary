@@ -311,7 +311,14 @@ class line_segment
 public:
 	vertex_2 vertex[2];
 
+	line_segment flip(void)
+	{
+		vertex_2 temp = vertex[0];
+		vertex[0] = vertex[1];
+		vertex[1] = temp;
 
+		return *this;
+	}
 
 	float length(void)
 	{

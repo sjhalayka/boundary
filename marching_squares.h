@@ -14,16 +14,16 @@ public:
 
 	inline vertex_2 vertex_interp(vertex_2 p1, vertex_2 p2, float v1, float v2, const float isovalue)
 	{
-		if (p2 < p1)
-		{
-			vertex_2 tp = p1;
-			p1 = p2;
-			p2 = tp;
+		//if (p2 < p1)
+		//{
+		//	vertex_2 tp = p1;
+		//	p1 = p2;
+		//	p2 = tp;
 
-			float tv = v1;
-			v1 = v2;
-			v2 = tv;
-		}
+		//	float tv = v1;
+		//	v1 = v2;
+		//	v2 = tv;
+		//}
 
 		vertex_2 temp;
 		float mu;

@@ -145,6 +145,10 @@ int main(int argc, char** argv)
 	while (contours.size() > 0)
 		merge_contours(contours, final_contours);
 
+
+
+	//randomize_contours(final_contours);
+
 	cout << final_contours.size() << endl;
 	
 
