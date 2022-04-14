@@ -131,6 +131,9 @@ int main(int argc, char** argv)
 	if (false == get_index(test_point_index))
 		test_point_index = get_closest_index(test_point);
 
+
+
+
 	for (size_t i = 0; i < line_segments[0].size(); i++)
 	{
 		contour c;
@@ -144,10 +147,6 @@ int main(int argc, char** argv)
 
 	while (contours.size() > 0)
 		merge_contours(contours, final_contours);
-
-
-
-	//randomize_contours(final_contours);
 
 	cout << final_contours.size() << endl;
 	
