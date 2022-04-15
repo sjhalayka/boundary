@@ -64,8 +64,9 @@ vector<vector<vertex_2>> train_points;
 vector<vector<line_segment>> line_segments;
 
 // Only one of these are needed, because we are using type count = 2
-vector<contour> contours;
+
 vector<contour> final_contours;
+vector<vector<vertex_2>> normals;
 
 void merge_contours(vector<contour> &c, vector<contour> &fc)
 {

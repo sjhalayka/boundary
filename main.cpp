@@ -132,7 +132,7 @@ int main(int argc, char** argv)
 		test_point_index = get_closest_index(test_point);
 
 
-
+	vector<contour> contours;
 
 	for (size_t i = 0; i < line_segments[0].size(); i++)
 	{
@@ -150,6 +150,25 @@ int main(int argc, char** argv)
 
 	cout << final_contours.size() << endl;
 	
+	// Get normals
+	for (size_t i = 0; i < final_contours.size(); i++)
+	{
+		float k = 0;
+
+		vector<vertex_2> n;
+
+		for (size_t j = 0; j < final_contours[i].d.size(); j++)
+		{
+			vertex_2 edge = final_contours[i].d[j].vertex[1] - final_contours[i].d[j].vertex[0];
+			
+			vertex_2 normal = vertex_2(-edge.y, edge.x);
+			normal.normalize();
+			normal = normal / 10.0f;
+			n.push_back(normal);
+		}
+
+		normals.push_back(n);
+	}
 
 
 
@@ -329,6 +348,8 @@ void display_func(void)
 
 	srand(123);
 
+
+
 	for (size_t i = 0; i < final_contours.size(); i++)
 	{
 		glColor3f(static_cast <float> (rand()) / static_cast <float> (RAND_MAX), static_cast <float> (rand()) / static_cast <float> (RAND_MAX), static_cast <float> (rand()) / static_cast <float> (RAND_MAX));// colours[i].r, colours[i].g, colours[i].b);
@@ -337,6 +358,12 @@ void display_func(void)
 		{
 			glVertex2f(final_contours[i].d[j].vertex[0].x, final_contours[i].d[j].vertex[0].y);
 			glVertex2f(final_contours[i].d[j].vertex[1].x, final_contours[i].d[j].vertex[1].y);
+
+			vertex_2 v((final_contours[i].d[j].vertex[0].x + final_contours[i].d[j].vertex[1].x) * 0.5f,
+				(final_contours[i].d[j].vertex[0].y + final_contours[i].d[j].vertex[1].y) * 0.5f);
+
+			glVertex2f(v.x, v.y);
+			glVertex2f(v.x + normals[i][j].x, v.y + normals[i][j].y);
 		}
 	}
 
