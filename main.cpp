@@ -39,20 +39,20 @@ int main(int argc, char** argv)
 			y *= template_width;
 
 
-			//if (i == 0)
-			//{
-			//	if (y < 0)
-			//	{
-			//		y = -y;
-			//	}
-			//}
-			//else
-			//{
-			//	if (y > 0)
-			//	{
-			//		y = -y;
-			//	}
-			//}
+			if (i == 0)
+			{
+				if (y < 0)
+				{
+					y = -y;
+				}
+			}
+			else
+			{
+				if (y > 0)
+				{
+					y = -y;
+				}
+			}
 					
 
 			vertex_2 v;
@@ -80,12 +80,13 @@ int main(int argc, char** argv)
 		float grid_y_pos = grid_y_max; // Start at maximum y.
 
 		// Begin march.
-		for (short unsigned int y = 0; y < marching_squares_resolution; y++, grid_y_pos -= step_size, grid_x_pos = grid_x_min)
-			for (short unsigned int x = 0; x < marching_squares_resolution; x++, grid_x_pos += step_size)
+		for (size_t y = 0; y < marching_squares_resolution; y++, grid_y_pos -= step_size, grid_x_pos = grid_x_min)
+			for (size_t x = 0; x < marching_squares_resolution; x++, grid_x_pos += step_size)
 				image[y * marching_squares_resolution + x] = get_value(i, vertex_2(grid_x_pos, grid_y_pos));
 
-
 		// Convolve image here...
+		image = opencv_blur(image, 25);
+
 
 
 		// Convert image to contours
@@ -93,9 +94,9 @@ int main(int argc, char** argv)
 		grid_y_pos = grid_y_max; // Start at maximum y.
 
 		// Begin march.
-		for (short unsigned int y = 0; y < marching_squares_resolution - 1; y++, grid_y_pos -= step_size, grid_x_pos = grid_x_min)
+		for (size_t y = 0; y < marching_squares_resolution - 1; y++, grid_y_pos -= step_size, grid_x_pos = grid_x_min)
 		{
-			for (short unsigned int x = 0; x < marching_squares_resolution - 1; x++, grid_x_pos += step_size)
+			for (size_t x = 0; x < marching_squares_resolution - 1; x++, grid_x_pos += step_size)
 			{
 				// Corner vertex order: 03
 				//                      12
