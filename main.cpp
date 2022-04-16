@@ -88,7 +88,7 @@ int main(int argc, char** argv)
 		// Convolve image here...
 
 
-
+		// Convert image to contours
 		grid_x_pos = grid_x_min; // Start at minimum x.
 		grid_y_pos = grid_y_max; // Start at maximum y.
 
@@ -110,15 +110,9 @@ int main(int argc, char** argv)
 				g.value[2] = image[(y + 1) * marching_squares_resolution + (x + 1)];
 				g.value[3] = image[y * marching_squares_resolution + (x + 1)];
 
-				//g.value[0] = get_value(i, g.vertex[0]);
-				//g.value[1] = get_value(i, g.vertex[1]);
-				//g.value[2] = get_value(i, g.vertex[2]);
-				//g.value[3] = get_value(i, g.vertex[3]);
-
 				g.generate_primitives(line_segments[i], triangles[i], isovalue);
 			}
 		}
-
 	}
 
 	if (false == get_index(test_point_index))
