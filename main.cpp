@@ -3,7 +3,7 @@
 // Cat image from: http://www.iacuc.arizona.edu/training/cats/index.html
 int main(int argc, char** argv)
 {
-	srand(123456);
+	srand(1234);
 
 	inverse_width = 1.0f / template_width;
 	step_size = template_width / static_cast<float>(marching_squares_resolution - 1);
@@ -35,24 +35,24 @@ int main(int argc, char** argv)
 
 			x -= 0.5f;
 			y -= 0.5f;
-
 			x *= template_width;
 			y *= template_width;
 
-			if (i == 0)
-			{
-				if (y < 0)
-				{
-					y = -y;
-				}
-			}
-			else
-			{
-				if (y > 0)
-				{
-					y = -y;
-				}
-			}
+
+			//if (i == 0)
+			//{
+			//	if (y < 0)
+			//	{
+			//		y = -y;
+			//	}
+			//}
+			//else
+			//{
+			//	if (y > 0)
+			//	{
+			//		y = -y;
+			//	}
+			//}
 					
 
 			vertex_2 v;
@@ -68,6 +68,8 @@ int main(int argc, char** argv)
 
 	for (size_t i = 0; i < type_count; i++)
 	{
+		vector<float> image(marching_squares_resolution * marching_squares_resolution, 0.0f);
+
 		grid_x_min = -template_width * 0.5f;
 		grid_y_max = template_height * 0.5f;
 
@@ -76,6 +78,19 @@ int main(int argc, char** argv)
 
 		float grid_x_pos = grid_x_min; // Start at minimum x.
 		float grid_y_pos = grid_y_max; // Start at maximum y.
+
+		// Begin march.
+		for (short unsigned int y = 0; y < marching_squares_resolution; y++, grid_y_pos -= step_size, grid_x_pos = grid_x_min)
+			for (short unsigned int x = 0; x < marching_squares_resolution; x++, grid_x_pos += step_size)
+				image[y * marching_squares_resolution + x] = get_value(i, vertex_2(grid_x_pos, grid_y_pos));
+
+
+		// Convolve image here...
+
+
+
+		grid_x_pos = grid_x_min; // Start at minimum x.
+		grid_y_pos = grid_y_max; // Start at maximum y.
 
 		// Begin march.
 		for (short unsigned int y = 0; y < marching_squares_resolution - 1; y++, grid_y_pos -= step_size, grid_x_pos = grid_x_min)
@@ -90,37 +105,15 @@ int main(int argc, char** argv)
 				g.vertex[2] = vertex_2(grid_x_pos + step_size, grid_y_pos - step_size);
 				g.vertex[3] = vertex_2(grid_x_pos + step_size, grid_y_pos);
 
+				g.value[0] = image[y * marching_squares_resolution + x];
+				g.value[1] = image[(y + 1) * marching_squares_resolution + x];
+				g.value[2] = image[(y + 1) * marching_squares_resolution + (x + 1)];
+				g.value[3] = image[y * marching_squares_resolution + (x + 1)];
+
 				g.value[0] = get_value(i, g.vertex[0]);
 				g.value[1] = get_value(i, g.vertex[1]);
 				g.value[2] = get_value(i, g.vertex[2]);
 				g.value[3] = get_value(i, g.vertex[3]);
-
-				if (do_border)
-				{
-					if (x == 0)
-					{
-						g.value[0] = -FLT_MAX;
-						g.value[1] = -FLT_MAX;
-					}
-
-					if (x == marching_squares_resolution - 2)
-					{
-						g.value[2] = -FLT_MAX;
-						g.value[3] = -FLT_MAX;
-					}
-
-					if (y == 0)
-					{
-						g.value[0] = -FLT_MAX;
-						g.value[3] = -FLT_MAX;
-					}
-
-					if (y == marching_squares_resolution - 2)
-					{
-						g.value[1] = -FLT_MAX;
-						g.value[2] = -FLT_MAX;
-					}
-				}
 
 				g.generate_primitives(line_segments[i], triangles[i], isovalue);
 			}
@@ -156,6 +149,16 @@ int main(int argc, char** argv)
 	while (contours.size() > 0)
 		merge_contours(contours, final_contours);
 
+	//for (size_t i = 0; i < 10; i++)
+	//{
+	//	contours = final_contours;
+	//	final_contours.clear();
+
+	//	while (contours.size() > 0)
+	//		merge_contours(contours, final_contours);
+	//}
+
+
 	//cout << final_contours.size() << endl;
 	
 	// Get normals
@@ -185,6 +188,10 @@ int main(int argc, char** argv)
 			continue;
 		}
 
+		const vertex_2 first_end_vertex = final_contours[i].d[0].vertex[0];
+		const vertex_2 last_end_vertex = final_contours[i].d[final_contours[i].d.size() - 1].vertex[1];
+		const bool is_closed = (first_end_vertex == last_end_vertex);
+
 		for (size_t j = 0; j < final_contours[i].d.size(); j++)
 		{
 			vertex_2 normal = normals[i][j];
@@ -193,12 +200,9 @@ int main(int argc, char** argv)
 			vertex_2 prev_normal = normal;
 			vertex_2 next_normal = normal;
 
-			vertex_2 first_end_vertex = final_contours[i].d[0].vertex[0];
-			vertex_2 last_end_vertex = final_contours[i].d[final_contours[i].d.size() - 1].vertex[1];
-
 			if (j == 0)
 			{
-				if (first_end_vertex == last_end_vertex)
+				if (is_closed)
 				{
 					prev_normal = normals[i][final_contours[i].d.size() - 1];
 					next_normal = normals[i][j + 1];
@@ -206,7 +210,7 @@ int main(int argc, char** argv)
 			}
 			else if (j == final_contours[i].d.size() - 1)
 			{
-				if (first_end_vertex == last_end_vertex)
+				if (is_closed)
 				{
 					prev_normal = normals[i][j - 1];
 					next_normal = normals[i][0];
@@ -228,7 +232,10 @@ int main(int argc, char** argv)
 			per_contour_curvature += k_i;
 		}
 
-		cout << "non-zero " << per_contour_curvature << endl;
+		if(is_closed)
+			cout << "closed non-zero " << per_contour_curvature << endl;
+		else
+			cout << "open non-zero " << per_contour_curvature << endl;
 	}
 
 
