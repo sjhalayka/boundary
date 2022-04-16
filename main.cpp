@@ -39,20 +39,20 @@ int main(int argc, char** argv)
 			x *= template_width;
 			y *= template_width;
 
-			//if (i == 0)
-			//{
-			//	if (y < 0)
-			//	{
-			//		y = -y;
-			//	}
-			//}
-			//else
-			//{
-			//	if (y > 0)
-			//	{
-			//		y = -y;
-			//	}
-			//}
+			if (i == 0)
+			{
+				if (y < 0)
+				{
+					y = -y;
+				}
+			}
+			else
+			{
+				if (y > 0)
+				{
+					y = -y;
+				}
+			}
 					
 
 			vertex_2 v;
@@ -139,22 +139,28 @@ int main(int argc, char** argv)
 		contour c;
 		line_segment ls = line_segments[0][i];
 
+		//if (line_segments[0][i].vertex[1] < line_segments[0][i].vertex[0])
+		//{
+		//	vertex_2 vtemp = line_segments[0][i].vertex[0];
+		//	line_segments[0][i].vertex[0] = line_segments[0][i].vertex[1];
+		//	line_segments[0][i].vertex[1] = vtemp;
+
+		//}
+
 		c.d.push_back(ls);
 		contours.push_back(c);
 	}
 
-	cout << contours.size() << endl;
+	//cout << contours.size() << endl;
 
 	while (contours.size() > 0)
 		merge_contours(contours, final_contours);
 
-	cout << final_contours.size() << endl;
+	//cout << final_contours.size() << endl;
 	
 	// Get normals
 	for (size_t i = 0; i < final_contours.size(); i++)
 	{
-		float k = 0;
-
 		vector<vertex_2> n;
 
 		for (size_t j = 0; j < final_contours[i].d.size(); j++)
@@ -163,14 +169,67 @@ int main(int argc, char** argv)
 			
 			vertex_2 normal = vertex_2(-edge.y, edge.x);
 			normal.normalize();
-			normal = normal / 10.0f;
 			n.push_back(normal);
 		}
 
 		normals.push_back(n);
 	}
 
+	for (size_t i = 0; i < final_contours.size(); i++)
+	{
+		float per_contour_curvature = 0;
 
+		if (final_contours[i].d.size() < 2)
+		{
+			cout << "zero " << per_contour_curvature << endl;
+			continue;
+		}
+
+		for (size_t j = 0; j < final_contours[i].d.size(); j++)
+		{
+			vertex_2 normal = normals[i][j];
+
+			// Set these by default
+			vertex_2 prev_normal = normal;
+			vertex_2 next_normal = normal;
+
+			vertex_2 first_end_vertex = final_contours[i].d[0].vertex[0];
+			vertex_2 last_end_vertex = final_contours[i].d[final_contours[i].d.size() - 1].vertex[1];
+
+			if (j == 0)
+			{
+				if (first_end_vertex == last_end_vertex)
+				{
+					prev_normal = normals[i][final_contours[i].d.size() - 1];
+					next_normal = normals[i][j + 1];
+				}
+			}
+			else if (j == final_contours[i].d.size() - 1)
+			{
+				if (first_end_vertex == last_end_vertex)
+				{
+					prev_normal = normals[i][j - 1];
+					next_normal = normals[i][0];
+				}
+			}
+			else
+			{
+				prev_normal = normals[i][j - 1];
+				next_normal = normals[i][j + 1];
+			}
+
+			// Calculate curvature here
+			float d_i = normal.dot(prev_normal) + normal.dot(next_normal);
+			d_i /= 2.0f;
+
+			// Normalize the average dot product to get the curvature
+			float k_i = (1.0f - d_i) / 2.0f;
+
+			per_contour_curvature += k_i;
+		}
+
+		cout << "non-zero " << per_contour_curvature << endl;
+	}
 
 
 	render_image(argc, argv);
@@ -317,6 +376,8 @@ void display_func(void)
 	glEnd();
 
 
+
+	//// Draw triangle outlines
 	//glBegin(GL_LINES);
 
 	//for (size_t i = 0; i < triangles.size(); i++)
@@ -346,10 +407,10 @@ void display_func(void)
 	glLineWidth(2);
 	glBegin(GL_LINES);
 
-	srand(123);
+	srand(1234);
 
 
-
+	// Draw contours
 	for (size_t i = 0; i < final_contours.size(); i++)
 	{
 		glColor3f(static_cast <float> (rand()) / static_cast <float> (RAND_MAX), static_cast <float> (rand()) / static_cast <float> (RAND_MAX), static_cast <float> (rand()) / static_cast <float> (RAND_MAX));// colours[i].r, colours[i].g, colours[i].b);
@@ -359,11 +420,12 @@ void display_func(void)
 			glVertex2f(final_contours[i].d[j].vertex[0].x, final_contours[i].d[j].vertex[0].y);
 			glVertex2f(final_contours[i].d[j].vertex[1].x, final_contours[i].d[j].vertex[1].y);
 
+			// Draw normal
 			vertex_2 v((final_contours[i].d[j].vertex[0].x + final_contours[i].d[j].vertex[1].x) * 0.5f,
 				(final_contours[i].d[j].vertex[0].y + final_contours[i].d[j].vertex[1].y) * 0.5f);
 
 			glVertex2f(v.x, v.y);
-			glVertex2f(v.x + normals[i][j].x, v.y + normals[i][j].y);
+			glVertex2f(v.x + normals[i][j].x / 50, v.y + normals[i][j].y / 50);
 		}
 	}
 
@@ -372,7 +434,7 @@ void display_func(void)
 
 
 
-	// Render image outline edge length.
+	// Render image outline edges.
 	//glLineWidth(2);
 	//glBegin(GL_LINES);
 

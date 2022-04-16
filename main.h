@@ -49,7 +49,7 @@ float background_colour = 0.33f;
 
 bool do_border = false;
 const size_t type_count = 2;
-const size_t marching_squares_resolution = 64; // Minimum is 2
+const size_t marching_squares_resolution = 128; // Minimum is 2
 
 float template_width = 1;
 float template_height = 0;
@@ -63,8 +63,7 @@ float grid_y_max = 0;
 vector<vector<vertex_2>> train_points;
 vector<vector<line_segment>> line_segments;
 
-// Only one of these are needed, because we are using type count = 2
-
+// Only one copy of the contours are needed, because we are using type count = 2
 vector<contour> final_contours;
 vector<vector<vertex_2>> normals;
 
@@ -85,14 +84,14 @@ void merge_contours(vector<contour> &c, vector<contour> &fc)
 
 	if (first_end_vertex == last_end_vertex)
 	{
-		cout << "Closed loop" << endl;
+		//cout << "Closed loop" << endl;
 		fc.push_back(c[c.size() - 1]);
 		c.pop_back();
 		return;
 	}
 	else
 	{
-		cout << "not a closed loop" << endl;
+		//cout << "not a closed loop" << endl;
 
 		for (size_t i = 0; i < c.size() - 1; i++)
 		{
@@ -102,12 +101,10 @@ void merge_contours(vector<contour> &c, vector<contour> &fc)
 			vertex_2 first1 = c[i].d[0].vertex[1];
 			vertex_2 last0 = c[i].d[c[i].d.size() - 1].vertex[0];
 
-
-
 			if (first_end_vertex == last0)
 			{
 				// found match, prepend data
-				cout << "prepend data flipped last0" << endl;
+				//cout << "prepend data flipped last0" << endl;
 
 				for (size_t j = 0; j < c[i].d.size(); j++)
 					c[c.size() - 1].d.push_front(c[i].d[j].flip());
@@ -119,7 +116,7 @@ void merge_contours(vector<contour> &c, vector<contour> &fc)
 			else if (first_end_vertex == last1)
 			{
 				// found match, prepend data
-				cout << "prepend data last1" << endl;
+				//cout << "prepend data last1" << endl;
 
 				for (size_t j = 0; j < c[i].d.size(); j++)
 					c[c.size() - 1].d.push_front(c[i].d[j]);
@@ -131,7 +128,7 @@ void merge_contours(vector<contour> &c, vector<contour> &fc)
 			else if (last_end_vertex == first0)
 			{
 				// found match, append data
-				cout << "append data first0" << endl;
+				//cout << "append data first0" << endl;
 
 				for (size_t j = 0; j < c[i].d.size(); j++)
 					c[c.size() - 1].d.push_back(c[i].d[j]);
@@ -143,7 +140,7 @@ void merge_contours(vector<contour> &c, vector<contour> &fc)
 			else if (last_end_vertex == first1)
 			{
 				// found match, append data
-				cout << "append data flipped first1" << endl;
+				//cout << "append data flipped first1" << endl;
 
 				for (size_t j = 0; j < c[i].d.size(); j++)
 					c[c.size() - 1].d.push_back(c[i].d[j].flip());
@@ -154,16 +151,11 @@ void merge_contours(vector<contour> &c, vector<contour> &fc)
 			}
 		}
 
-
-
 		// no match found
 		fc.push_back(c[c.size() - 1]);
 		c.pop_back();
 
 		return;
-
-
-
 	}
 }
 
