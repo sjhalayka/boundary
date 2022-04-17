@@ -3,7 +3,7 @@
 // Cat image from: http://www.iacuc.arizona.edu/training/cats/index.html
 int main(int argc, char** argv)
 {
-	srand(1234);
+	srand(1234567);
 
 	inverse_width = 1.0f / template_width;
 	step_size = template_width / static_cast<float>(marching_squares_resolution - 1);
@@ -28,7 +28,7 @@ int main(int argc, char** argv)
 
 	for (size_t i = 0; i < type_count; i++)
 	{
-		for (size_t j = 0; j < 10; j++)
+		for (size_t j = 0; j < 5; j++)
 		{
 			float x = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
 			float y = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
@@ -85,7 +85,7 @@ int main(int argc, char** argv)
 				image[y * marching_squares_resolution + x] = get_value(i, vertex_2(grid_x_pos, grid_y_pos));
 
 		// Convolve image here...
-		image = opencv_blur(image, 25);
+		//image = opencv_blur(image, 50);
 
 
 

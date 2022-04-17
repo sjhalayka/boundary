@@ -62,7 +62,7 @@ float background_colour = 0.33f;
 
 bool do_border = false;
 const size_t type_count = 2;
-const size_t marching_squares_resolution = 64; // Minimum is 2
+const size_t marching_squares_resolution = 32; // Minimum is 2
 
 float template_width = 1;
 float template_height = 0;
@@ -398,7 +398,7 @@ vector<float> blur(const vector<float>& image)
 }
 
 
-vector<float> opencv_blur(const vector<float>& image, const size_t num_iterations = 5)
+vector<float> opencv_blur(const vector<float>& image, const size_t num_iterations)
 {
 	Mat m = Mat(marching_squares_resolution, marching_squares_resolution, CV_32FC1);
 	memcpy(m.data, image.data(), image.size() * sizeof(float));
