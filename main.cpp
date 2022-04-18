@@ -3,7 +3,7 @@
 // Cat image from: http://www.iacuc.arizona.edu/training/cats/index.html
 int main(int argc, char** argv)
 {
-	srand(123);
+	srand(1234);
 
 	inverse_width = 1.0f / template_width;
 	step_size = template_width / static_cast<float>(marching_squares_resolution - 1);
@@ -39,20 +39,20 @@ int main(int argc, char** argv)
 			y *= template_width;
 
 
-			if (i == 0)
-			{
-				if (y < 0)
-				{
-					y = -y;
-				}
-			}
-			else
-			{
-				if (y > 0)
-				{
-					y = -y;
-				}
-			}
+			//if (i == 0)
+			//{
+			//	if (y < 0)
+			//	{
+			//		y = -y;
+			//	}
+			//}
+			//else
+			//{
+			//	if (y > 0)
+			//	{
+			//		y = -y;
+			//	}
+			//}
 					
 
 			vertex_2 v;
@@ -84,8 +84,22 @@ int main(int argc, char** argv)
 			for (size_t x = 0; x < marching_squares_resolution; x++, grid_x_pos += step_size)
 				image[y * marching_squares_resolution + x] = get_value(i, vertex_2(grid_x_pos, grid_y_pos));
 
+		
+		
 		// Convolve image here...
-		//image = opencv_blur(image, 50);
+
+
+		float_grayscale luma;
+		luma.px = marching_squares_resolution;
+		luma.py = marching_squares_resolution;
+
+		luma.pixel_data = image;
+		write_float_grayscale_to_tga("out0.tga", luma);
+			
+		image = opencv_blur(image, 50);
+		luma.pixel_data = image;
+
+		write_float_grayscale_to_tga("out1.tga", luma);
 
 
 
@@ -380,29 +394,29 @@ void display_func(void)
 
 
 	//// Draw triangle outlines
-	//glBegin(GL_LINES);
+	glBegin(GL_LINES);
 
-	//for (size_t i = 0; i < triangles.size(); i++)
-	//{
-	//	glColor3f(
-	//		(colours[i].r),
-	//		(colours[i].g),
-	//		(colours[i].b));
+	for (size_t i = 0; i < triangles.size(); i++)
+	{
+		glColor3f(
+			(colours[i].r),
+			(colours[i].g),
+			(colours[i].b));
 
-	//	for (size_t j = 0; j < triangles[i].size(); j++)
-	//	{
-	//		glVertex2f(triangles[i][j].vertex[0].x, triangles[i][j].vertex[0].y);
-	//		glVertex2f(triangles[i][j].vertex[1].x, triangles[i][j].vertex[1].y);
+		for (size_t j = 0; j < triangles[i].size(); j++)
+		{
+			glVertex2f(triangles[i][j].vertex[0].x, triangles[i][j].vertex[0].y);
+			glVertex2f(triangles[i][j].vertex[1].x, triangles[i][j].vertex[1].y);
 
-	//		glVertex2f(triangles[i][j].vertex[1].x, triangles[i][j].vertex[1].y);
-	//		glVertex2f(triangles[i][j].vertex[2].x, triangles[i][j].vertex[2].y);
+			glVertex2f(triangles[i][j].vertex[1].x, triangles[i][j].vertex[1].y);
+			glVertex2f(triangles[i][j].vertex[2].x, triangles[i][j].vertex[2].y);
 
-	//		glVertex2f(triangles[i][j].vertex[2].x, triangles[i][j].vertex[2].y);
-	//		glVertex2f(triangles[i][j].vertex[0].x, triangles[i][j].vertex[0].y);
+			glVertex2f(triangles[i][j].vertex[2].x, triangles[i][j].vertex[2].y);
+			glVertex2f(triangles[i][j].vertex[0].x, triangles[i][j].vertex[0].y);
 
-	//	}
-	//}
-	//glEnd();
+		}
+	}
+	glEnd();
 
 
 

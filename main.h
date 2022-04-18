@@ -7,6 +7,7 @@
 
 #include "primitives.h"
 #include "marching_squares.h"
+#include "image.h"
 
 #include <vector>
 using std::vector;
@@ -62,7 +63,7 @@ float background_colour = 0.33f;
 
 bool do_border = false;
 const size_t type_count = 2;
-const size_t marching_squares_resolution = 32; // Minimum is 2
+const size_t marching_squares_resolution = 64; // Minimum is 2
 
 float template_width = 1;
 float template_height = 0;
@@ -327,7 +328,7 @@ size_t get_closest_index(const vertex_2 v)
 			float distance = ls.length();
 
 			if(distance != 0)
-				total_distance += 1.0f / distance;
+				total_distance += 1.0f / powf(distance, 0.25f);
 		}
 
 		distance_index_map[total_distance] = i;
@@ -360,9 +361,9 @@ float get_value(const size_t index, const vertex_2 v)
 			if (distance != 0)
 			{
 				if (index == i)
-					running_value += 1.0f / distance;
+					running_value += 1.0f / powf(distance, 0.25f);
 				else
-					running_value -= 1.0f / distance;
+					running_value -= 1.0f / powf(distance, 0.25f);
 			}
 		}
 	}
