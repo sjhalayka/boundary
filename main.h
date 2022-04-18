@@ -371,32 +371,6 @@ float get_value(const size_t index, const vertex_2 v)
 }
 
 
-vector<float> blur(const vector<float>& image)
-{
-	vector<float> temp_image = image;
-
-	for (size_t y = 1; y < marching_squares_resolution - 1; y++)
-	{
-		for (size_t x = 1; x < marching_squares_resolution - 1; x++)
-		{
-			float running_val = 0;
-
-			for (size_t i = x - 1; i < x + 1; i++)
-			{
-				for (size_t j = y - 1; j < y + 1; j++)
-				{
-					running_val += image[j * marching_squares_resolution + i];
-				}
-			}
-
-			running_val /= 9.0f;
-			temp_image[y * marching_squares_resolution + x] = running_val;
-		}
-	}
-
-	return temp_image;
-}
-
 
 vector<float> opencv_blur(const vector<float>& image, const size_t num_iterations)
 {

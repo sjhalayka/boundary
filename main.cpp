@@ -3,7 +3,7 @@
 // Cat image from: http://www.iacuc.arizona.edu/training/cats/index.html
 int main(int argc, char** argv)
 {
-	srand(1234567);
+	srand(123);
 
 	inverse_width = 1.0f / template_width;
 	step_size = template_width / static_cast<float>(marching_squares_resolution - 1);
