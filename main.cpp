@@ -30,6 +30,8 @@ int main(int argc, char** argv)
 	{
 		for (size_t j = 0; j < 5; j++)
 		{
+
+
 			float x = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
 			float y = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
 
@@ -39,20 +41,20 @@ int main(int argc, char** argv)
 			y *= template_width;
 
 
-			//if (i == 0)
-			//{
-			//	if (y < 0)
-			//	{
-			//		y = -y;
-			//	}
-			//}
-			//else
-			//{
-			//	if (y > 0)
-			//	{
-			//		y = -y;
-			//	}
-			//}
+			if (i == 0)
+			{
+				if (y < 0)
+				{
+					y = -y;
+				}
+			}
+			else
+			{
+				if (y > 0)
+				{
+					y = -y;
+				}
+			}
 					
 
 			vertex_2 v;
@@ -95,11 +97,19 @@ int main(int argc, char** argv)
 
 		luma.pixel_data = image;
 		write_float_grayscale_to_tga("out0.tga", luma);
-			
-		image = opencv_blur(image, 50);
-		luma.pixel_data = image;
 
-		write_float_grayscale_to_tga("out1.tga", luma);
+		//image = opencv_blur(image, 100);
+		//luma.pixel_data = image;
+		//write_float_grayscale_to_tga("out1.tga", luma);
+
+		//image = opencv_blur(image, 150);
+		//luma.pixel_data = image;
+		//write_float_grayscale_to_tga("out2.tga", luma);
+
+
+
+
+
 
 
 
@@ -394,42 +404,42 @@ void display_func(void)
 
 
 	//// Draw triangle outlines
+	//glBegin(GL_LINES);
+
+	//for (size_t i = 0; i < triangles.size(); i++)
+	//{
+	//	glColor3f(
+	//		(colours[i].r),
+	//		(colours[i].g),
+	//		(colours[i].b));
+
+	//	for (size_t j = 0; j < triangles[i].size(); j++)
+	//	{
+	//		glVertex2f(triangles[i][j].vertex[0].x, triangles[i][j].vertex[0].y);
+	//		glVertex2f(triangles[i][j].vertex[1].x, triangles[i][j].vertex[1].y);
+
+	//		glVertex2f(triangles[i][j].vertex[1].x, triangles[i][j].vertex[1].y);
+	//		glVertex2f(triangles[i][j].vertex[2].x, triangles[i][j].vertex[2].y);
+
+	//		glVertex2f(triangles[i][j].vertex[2].x, triangles[i][j].vertex[2].y);
+	//		glVertex2f(triangles[i][j].vertex[0].x, triangles[i][j].vertex[0].y);
+
+	//	}
+	//}
+	//glEnd();
+
+
+
+	glLineWidth(1);
 	glBegin(GL_LINES);
 
-	for (size_t i = 0; i < triangles.size(); i++)
-	{
-		glColor3f(
-			(colours[i].r),
-			(colours[i].g),
-			(colours[i].b));
-
-		for (size_t j = 0; j < triangles[i].size(); j++)
-		{
-			glVertex2f(triangles[i][j].vertex[0].x, triangles[i][j].vertex[0].y);
-			glVertex2f(triangles[i][j].vertex[1].x, triangles[i][j].vertex[1].y);
-
-			glVertex2f(triangles[i][j].vertex[1].x, triangles[i][j].vertex[1].y);
-			glVertex2f(triangles[i][j].vertex[2].x, triangles[i][j].vertex[2].y);
-
-			glVertex2f(triangles[i][j].vertex[2].x, triangles[i][j].vertex[2].y);
-			glVertex2f(triangles[i][j].vertex[0].x, triangles[i][j].vertex[0].y);
-
-		}
-	}
-	glEnd();
-
-
-
-	glLineWidth(2);
-	glBegin(GL_LINES);
-
-	srand(1234);
+	//srand(1234);
 
 
 	// Draw contours
 	for (size_t i = 0; i < final_contours.size(); i++)
 	{
-		glColor3f(static_cast <float> (rand()) / static_cast <float> (RAND_MAX), static_cast <float> (rand()) / static_cast <float> (RAND_MAX), static_cast <float> (rand()) / static_cast <float> (RAND_MAX));// colours[i].r, colours[i].g, colours[i].b);
+		glColor3f(0, 0, 0);// static_cast <float> (rand()) / static_cast <float> (RAND_MAX), static_cast <float> (rand()) / static_cast <float> (RAND_MAX), static_cast <float> (rand()) / static_cast <float> (RAND_MAX));// colours[i].r, colours[i].g, colours[i].b);
 
 		for (size_t j = 0; j < final_contours[i].d.size(); j++)
 		{
@@ -437,11 +447,11 @@ void display_func(void)
 			glVertex2f(final_contours[i].d[j].vertex[1].x, final_contours[i].d[j].vertex[1].y);
 
 			// Draw normal
-			vertex_2 v((final_contours[i].d[j].vertex[0].x + final_contours[i].d[j].vertex[1].x) * 0.5f,
-				(final_contours[i].d[j].vertex[0].y + final_contours[i].d[j].vertex[1].y) * 0.5f);
+			//vertex_2 v((final_contours[i].d[j].vertex[0].x + final_contours[i].d[j].vertex[1].x) * 0.5f,
+			//	(final_contours[i].d[j].vertex[0].y + final_contours[i].d[j].vertex[1].y) * 0.5f);
 
-			glVertex2f(v.x, v.y);
-			glVertex2f(v.x + normals[i][j].x / 50, v.y + normals[i][j].y / 50);
+			//glVertex2f(v.x, v.y);
+			//glVertex2f(v.x + normals[i][j].x / 50, v.y + normals[i][j].y / 50);
 		}
 	}
 
@@ -498,8 +508,8 @@ void display_func(void)
 		}
 	}
 
-	glColor3f(colours[test_point_index].r, colours[test_point_index].g, colours[test_point_index].b);
-	glVertex2f(test_point.x, test_point.y);
+	//glColor3f(colours[test_point_index].r, colours[test_point_index].g, colours[test_point_index].b);
+	//glVertex2f(test_point.x, test_point.y);
 
 	glEnd();
 

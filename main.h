@@ -41,7 +41,7 @@ public:
 
 
 
-void render_image(int &argc, char ** &argv);
+void render_image(int& argc, char**& argv);
 void idle_func(void);
 void reshape_func(int width, int height);
 void display_func(void);
@@ -63,7 +63,7 @@ float background_colour = 0.33f;
 
 bool do_border = false;
 const size_t type_count = 2;
-const size_t marching_squares_resolution = 64; // Minimum is 2
+const size_t marching_squares_resolution = 2; // Minimum is 2
 
 float template_width = 1;
 float template_height = 0;
@@ -81,9 +81,9 @@ vector<vector<line_segment>> line_segments;
 vector<contour> final_contours;
 vector<vector<vertex_2>> normals;
 
-void merge_contours(vector<contour> &c, vector<contour> &fc)
+void merge_contours(vector<contour>& c, vector<contour>& fc)
 {
-	if(c.size() == 0)
+	if (c.size() == 0)
 		return;
 
 	if (c.size() == 1)
@@ -186,7 +186,7 @@ size_t test_point_index = 0;
 
 
 bool ray_intersects_triangle(
-	const vertex_3 & orig, const vertex_3& dir,
+	const vertex_3& orig, const vertex_3& dir,
 	const vertex_3& v0, const vertex_3& v1, const vertex_3& v2,
 	float& t)
 {
@@ -295,7 +295,7 @@ bool ray_intersects_triangle_vector(size_t index)
 	return false;
 }
 
-bool get_index(size_t &out)
+bool get_index(size_t& out)
 {
 	for (size_t i = 0; i < type_count; i++)
 	{
@@ -327,8 +327,8 @@ size_t get_closest_index(const vertex_2 v)
 
 			float distance = ls.length();
 
-			if(distance != 0)
-				total_distance += 1.0f / powf(distance, 0.25f);
+			if (distance != 0)
+				total_distance += 1.0f / powf(distance, 1);
 		}
 
 		distance_index_map[total_distance] = i;
@@ -361,9 +361,9 @@ float get_value(const size_t index, const vertex_2 v)
 			if (distance != 0)
 			{
 				if (index == i)
-					running_value += 1.0f / powf(distance, 0.25f);
+					running_value += 1.0f / powf(distance, 1);
 				else
-					running_value -= 1.0f / powf(distance, 0.25f);
+					running_value -= 1.0f / powf(distance, 1);
 			}
 		}
 	}
@@ -378,13 +378,33 @@ vector<float> opencv_blur(const vector<float>& image, const size_t num_iteration
 	Mat m = Mat(marching_squares_resolution, marching_squares_resolution, CV_32FC1);
 	memcpy(m.data, image.data(), image.size() * sizeof(float));
 
-	for(size_t i = 0; i < num_iterations; i++)
+	for (size_t i = 0; i < num_iterations; i++)
 		GaussianBlur(m, m, Size(25, 25), 1, 1);
 
 	vector<float> temp_image = image;
 	memcpy(&temp_image[0], m.data, image.size() * sizeof(float));
 
 	return temp_image;
+}
+
+vector<float> opencv_sharpen(const vector<float>& image)
+{
+	Mat m = Mat(marching_squares_resolution, marching_squares_resolution, CV_32FC1);
+	memcpy(m.data, image.data(), image.size() * sizeof(float));
+
+	Mat kernel3 = (Mat_<double>(3, 3) <<
+		0, -1, 0,
+		-1, 5, -1,
+		0, -1, 0);
+
+	filter2D(m, m, -1, kernel3, Point(-1, -1), 0, BORDER_DEFAULT);
+
+	vector<float> temp_image = image;
+	memcpy(&temp_image[0], m.data, image.size() * sizeof(float));
+
+	return temp_image;
+
+
 }
 
 #endif
