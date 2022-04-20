@@ -6,35 +6,35 @@ int main(int argc, char** argv)
 	vector<vector<float>> two_by_two = get_data(2);
 	vector<vector<float>> res_by_res = get_data(marching_squares_resolution);
 
-	float_grayscale luma;
-	luma.px = 2;
-	luma.py = 2;
-	luma.pixel_data = two_by_two[0];
-	write_float_grayscale_to_tga("2by2.tga", luma);
-
-	luma.px = marching_squares_resolution;
-	luma.py = marching_squares_resolution;
-	luma.pixel_data = res_by_res[0];
-	write_float_grayscale_to_tga("resbyres.tga", luma);
+	for (size_t i = 0; i < two_by_two.size(); i++)
+		//two_by_two[i] = resize_from_2by2(two_by_two[i], marching_squares_resolution);
+		two_by_two[i] = opencv_resize(two_by_two[i], marching_squares_resolution);
 
 
-	//cout << "done setup" << endl;
+	vector<vector<float>> morphed_images = opencv_lerp(two_by_two, res_by_res, marching_squares_resolution, 0);
 
-	//vector<float> image = get_data(marching_squares_resolution);
+	if(marching_squares_resolution == 2)
+		two_by_two = get_data(two_by_two, marching_squares_resolution);
+	else
+		res_by_res = get_data(morphed_images, marching_squares_resolution);
 
-	////vector<float> image2 = get_data(2);
 
-	////image2 = resize_from_2by2(image2, marching_squares_resolution);
-
-	////image2 = opencv_resize(image2, marching_squares_resolution);
-
-	//vector<float> morphed_image = image;// vector<float>(marching_squares_resolution * marching_squares_resolution, 0.0f);
 
 	//float_grayscale luma;
+
+
 	//luma.px = marching_squares_resolution;
 	//luma.py = marching_squares_resolution;
-	//luma.pixel_data = morphed_image;
+	//luma.pixel_data = image;
 	//write_float_grayscale_to_tga("image.tga", luma);
+
+
+	//luma.px = marching_squares_resolution;
+	//luma.py = marching_squares_resolution;
+	//luma.pixel_data = image2;
+	//write_float_grayscale_to_tga("image2.tga", luma);
+
+
 
 
 	if (false == get_index(test_point_index))
