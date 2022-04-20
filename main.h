@@ -53,6 +53,9 @@ void keyboard_func(unsigned char key, int x, int y);
 
 
 
+
+
+
 // A C++ namespace wouldn't hurt here...
 
 // OpenGL viewport parameters.
@@ -63,7 +66,7 @@ float background_colour = 0.33f;
 
 bool do_border = false;
 const size_t type_count = 2;
-const size_t marching_squares_resolution = 2; // Minimum is 2
+const size_t marching_squares_resolution = 32; // Minimum is 2
 
 float template_width = 1;
 float template_height = 0;
@@ -406,5 +409,175 @@ vector<float> opencv_sharpen(const vector<float>& image)
 
 
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+void get_data(size_t target_res)
+{
+	srand(1234);
+
+	inverse_width = 1.0f / template_width;
+	step_size = template_width / static_cast<float>(target_res - 1);
+	template_height = step_size * (target_res - 1);
+
+	train_points.clear();
+	line_segments.clear();
+	triangles.clear();
+	colours.clear();
+
+	train_points.resize(type_count);
+	line_segments.resize(type_count);
+	triangles.resize(type_count);
+	colours.resize(type_count);
+
+	for (size_t i = 0; i < colours.size(); i++)
+	{
+		colours[i].r = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+		colours[i].g = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+		colours[i].b = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+	}
+
+	for (size_t i = 0; i < type_count; i++)
+	{
+		for (size_t j = 0; j < 5; j++)
+		{
+			float x = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+			float y = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+
+			x -= 0.5f;
+			y -= 0.5f;
+			x *= template_width;
+			y *= template_width;
+
+			if (i == 0)
+			{
+				if (y < 0)
+				{
+					y = -y;
+				}
+			}
+			else
+			{
+				if (y > 0)
+				{
+					y = -y;
+				}
+			}
+
+
+			vertex_2 v;
+			v.x = x;
+			v.y = y;
+
+			train_points[i].push_back(v);
+		}
+	}
+
+
+
+
+	for (size_t i = 0; i < type_count; i++)
+	{
+		vector<float> image(target_res * target_res, 0.0f);
+
+		grid_x_min = -template_width * 0.5f;
+		grid_y_max = template_height * 0.5f;
+
+		// Generate geometric primitives using marching squares.
+		grid_square g;
+
+		float grid_x_pos = grid_x_min; // Start at minimum x.
+		float grid_y_pos = grid_y_max; // Start at maximum y.
+
+		// Begin march.
+		for (size_t y = 0; y < target_res; y++, grid_y_pos -= step_size, grid_x_pos = grid_x_min)
+			for (size_t x = 0; x < target_res; x++, grid_x_pos += step_size)
+				image[y * target_res + x] = get_value(i, vertex_2(grid_x_pos, grid_y_pos));
+
+
+
+		// Convolve image here...
+
+
+		float_grayscale luma;
+		luma.px = target_res;
+		luma.py = target_res;
+
+		luma.pixel_data = image;
+		write_float_grayscale_to_tga("out0.tga", luma);
+
+		//image = opencv_blur(image, 100);
+		//luma.pixel_data = image;
+		//write_float_grayscale_to_tga("out1.tga", luma);
+
+		//image = opencv_blur(image, 150);
+		//luma.pixel_data = image;
+		//write_float_grayscale_to_tga("out2.tga", luma);
+
+
+
+
+
+
+
+
+		// Convert image to contours
+		grid_x_pos = grid_x_min; // Start at minimum x.
+		grid_y_pos = grid_y_max; // Start at maximum y.
+
+		// Begin march.
+		for (size_t y = 0; y < target_res - 1; y++, grid_y_pos -= step_size, grid_x_pos = grid_x_min)
+		{
+			for (size_t x = 0; x < target_res - 1; x++, grid_x_pos += step_size)
+			{
+				// Corner vertex order: 03
+				//                      12
+				// e.g.: clockwise, as in OpenGL
+				g.vertex[0] = vertex_2(grid_x_pos, grid_y_pos);
+				g.vertex[1] = vertex_2(grid_x_pos, grid_y_pos - step_size);
+				g.vertex[2] = vertex_2(grid_x_pos + step_size, grid_y_pos - step_size);
+				g.vertex[3] = vertex_2(grid_x_pos + step_size, grid_y_pos);
+
+				g.value[0] = image[y * target_res + x];
+				g.value[1] = image[(y + 1) * target_res + x];
+				g.value[2] = image[(y + 1) * target_res + (x + 1)];
+				g.value[3] = image[y * target_res + (x + 1)];
+
+				g.generate_primitives(line_segments[i], triangles[i], isovalue);
+			}
+		}
+	}
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 #endif
