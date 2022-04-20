@@ -421,14 +421,60 @@ vector<float> opencv_sharpen(const vector<float>& image)
 
 
 
-
-
-
-
-
-
-void get_data(size_t target_res)
+vector<float> opencv_resize(const vector<float>& image, size_t target_res)
 {
+	Mat m = Mat(2, 2, CV_32FC1);
+	memcpy(m.data, image.data(), image.size() * sizeof(float));
+
+	float x = static_cast<float>(target_res) / 2;
+
+	resize(m, m, cv::Size(), x, x, INTER_LINEAR);
+	vector<float> temp_image(target_res * target_res);
+	memcpy(&temp_image[0], m.data, temp_image.size() * sizeof(float));
+
+	return temp_image;
+}
+
+vector<float> resize_from_2by2(const vector<float>& image, size_t target_res)
+{
+	vector<float> temp_image(target_res * target_res, 0.0f);
+
+	const float upper_left = image[0];
+	const float upper_right = image[1];
+	const float lower_right = image[2];
+	const float lower_left = image[3];
+
+	for (size_t i = 0; i < target_res; i++)
+	{
+		for (size_t j = 0; j < target_res; j++)
+		{
+			size_t index = i * target_res + j;
+
+			if (i < target_res / 2)
+				if (j < target_res / 2)
+					temp_image[index] = upper_left;
+				else
+					temp_image[index] = upper_right;
+			else
+				if (j < target_res / 2)
+					temp_image[index] = lower_right;
+				else
+					temp_image[index] = lower_left;
+		}
+	}
+
+	return temp_image;
+}
+
+
+
+
+
+
+vector<vector<float>> get_data(size_t target_res)
+{
+	vector<vector<float>> images;
+
 	srand(1234);
 
 	inverse_width = 1.0f / template_width;
@@ -493,8 +539,6 @@ void get_data(size_t target_res)
 
 	for (size_t i = 0; i < type_count; i++)
 	{
-		vector<float> image(target_res * target_res, 0.0f);
-
 		grid_x_min = -template_width * 0.5f;
 		grid_y_max = template_height * 0.5f;
 
@@ -504,30 +548,32 @@ void get_data(size_t target_res)
 		float grid_x_pos = grid_x_min; // Start at minimum x.
 		float grid_y_pos = grid_y_max; // Start at maximum y.
 
+		vector<float> image(target_res * target_res, 0.0f);
+
 		// Begin march.
 		for (size_t y = 0; y < target_res; y++, grid_y_pos -= step_size, grid_x_pos = grid_x_min)
 			for (size_t x = 0; x < target_res; x++, grid_x_pos += step_size)
 				image[y * target_res + x] = get_value(i, vertex_2(grid_x_pos, grid_y_pos));
 
+		images.push_back(image);
+
+		//// Convolve image here...
 
 
-		// Convolve image here...
+		//float_grayscale luma;
+		//luma.px = target_res;
+		//luma.py = target_res;
 
-
-		float_grayscale luma;
-		luma.px = target_res;
-		luma.py = target_res;
-
-		luma.pixel_data = image;
-		write_float_grayscale_to_tga("out0.tga", luma);
-
-		//image = opencv_blur(image, 100);
 		//luma.pixel_data = image;
-		//write_float_grayscale_to_tga("out1.tga", luma);
+		//write_float_grayscale_to_tga("out0.tga", luma);
 
-		//image = opencv_blur(image, 150);
-		//luma.pixel_data = image;
-		//write_float_grayscale_to_tga("out2.tga", luma);
+		////image = opencv_blur(image, 100);
+		////luma.pixel_data = image;
+		////write_float_grayscale_to_tga("out1.tga", luma);
+
+		////image = opencv_blur(image, 150);
+		////luma.pixel_data = image;
+		////write_float_grayscale_to_tga("out2.tga", luma);
 
 
 
@@ -562,6 +608,8 @@ void get_data(size_t target_res)
 			}
 		}
 	}
+
+	return images;
 }
 
 

@@ -3,9 +3,38 @@
 // Cat image from: http://www.iacuc.arizona.edu/training/cats/index.html
 int main(int argc, char** argv)
 {
-	get_data(2);
+	vector<vector<float>> two_by_two = get_data(2);
+	vector<vector<float>> res_by_res = get_data(marching_squares_resolution);
 
-	get_data(marching_squares_resolution);
+	float_grayscale luma;
+	luma.px = 2;
+	luma.py = 2;
+	luma.pixel_data = two_by_two[0];
+	write_float_grayscale_to_tga("2by2.tga", luma);
+
+	luma.px = marching_squares_resolution;
+	luma.py = marching_squares_resolution;
+	luma.pixel_data = res_by_res[0];
+	write_float_grayscale_to_tga("resbyres.tga", luma);
+
+
+	//cout << "done setup" << endl;
+
+	//vector<float> image = get_data(marching_squares_resolution);
+
+	////vector<float> image2 = get_data(2);
+
+	////image2 = resize_from_2by2(image2, marching_squares_resolution);
+
+	////image2 = opencv_resize(image2, marching_squares_resolution);
+
+	//vector<float> morphed_image = image;// vector<float>(marching_squares_resolution * marching_squares_resolution, 0.0f);
+
+	//float_grayscale luma;
+	//luma.px = marching_squares_resolution;
+	//luma.py = marching_squares_resolution;
+	//luma.pixel_data = morphed_image;
+	//write_float_grayscale_to_tga("image.tga", luma);
 
 
 	if (false == get_index(test_point_index))
