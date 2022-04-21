@@ -41,7 +41,7 @@ public:
 
 
 
-void render_image(int &argc, char ** &argv);
+void render_image(int& argc, char**& argv);
 void idle_func(void);
 void reshape_func(int width, int height);
 void display_func(void);
@@ -50,6 +50,9 @@ void keyboard_func(unsigned char key, int x, int y);
 
 // g++ *.cpp -framework GLUT -framework OpenGL
 #include <GL/glut.h>
+
+
+
 
 
 
@@ -81,9 +84,9 @@ vector<vector<line_segment>> line_segments;
 vector<contour> final_contours;
 vector<vector<vertex_2>> normals;
 
-void merge_contours(vector<contour> &c, vector<contour> &fc)
+void merge_contours(vector<contour>& c, vector<contour>& fc)
 {
-	if(c.size() == 0)
+	if (c.size() == 0)
 		return;
 
 	if (c.size() == 1)
@@ -186,7 +189,7 @@ size_t test_point_index = 0;
 
 
 bool ray_intersects_triangle(
-	const vertex_3 & orig, const vertex_3& dir,
+	const vertex_3& orig, const vertex_3& dir,
 	const vertex_3& v0, const vertex_3& v1, const vertex_3& v2,
 	float& t)
 {
@@ -295,7 +298,7 @@ bool ray_intersects_triangle_vector(size_t index)
 	return false;
 }
 
-bool get_index(size_t &out)
+bool get_index(size_t& out)
 {
 	for (size_t i = 0; i < type_count; i++)
 	{
@@ -327,8 +330,8 @@ size_t get_closest_index(const vertex_2 v)
 
 			float distance = ls.length();
 
-			if(distance != 0)
-				total_distance += 1.0f / powf(distance, 0.25f);
+			if (distance != 0)
+				total_distance += 1.0f / powf(distance, 1);
 		}
 
 		distance_index_map[total_distance] = i;
@@ -361,9 +364,9 @@ float get_value(const size_t index, const vertex_2 v)
 			if (distance != 0)
 			{
 				if (index == i)
-					running_value += 1.0f / powf(distance, 0.25f);
+					running_value += 1.0f / powf(distance, 1);
 				else
-					running_value -= 1.0f / powf(distance, 0.25f);
+					running_value -= 1.0f / powf(distance, 1);
 			}
 		}
 	}
@@ -378,7 +381,7 @@ vector<float> opencv_blur(const vector<float>& image, const size_t num_iteration
 	Mat m = Mat(marching_squares_resolution, marching_squares_resolution, CV_32FC1);
 	memcpy(m.data, image.data(), image.size() * sizeof(float));
 
-	for(size_t i = 0; i < num_iterations; i++)
+	for (size_t i = 0; i < num_iterations; i++)
 		GaussianBlur(m, m, Size(25, 25), 1, 1);
 
 	vector<float> temp_image = image;
@@ -386,5 +389,385 @@ vector<float> opencv_blur(const vector<float>& image, const size_t num_iteration
 
 	return temp_image;
 }
+
+vector<float> opencv_sharpen(const vector<float>& image)
+{
+	Mat m = Mat(marching_squares_resolution, marching_squares_resolution, CV_32FC1);
+	memcpy(m.data, image.data(), image.size() * sizeof(float));
+
+	Mat kernel3 = (Mat_<double>(3, 3) <<
+		0, -1, 0,
+		-1, 5, -1,
+		0, -1, 0);
+
+	filter2D(m, m, -1, kernel3, Point(-1, -1), 0, BORDER_DEFAULT);
+
+	vector<float> temp_image = image;
+	memcpy(&temp_image[0], m.data, image.size() * sizeof(float));
+
+	return temp_image;
+
+
+}
+
+
+
+
+
+
+vector<vector<float>> opencv_lerp(const vector<vector<float>> &images0, const vector<vector<float>>& images1, size_t target_res, double factor)
+{
+	vector<vector<float>> temp_images;
+
+	for (size_t i = 0; i < images0.size(); i++)
+	{
+		Mat m0 = Mat(target_res, target_res, CV_32FC1);
+		memcpy(m0.data, images0[i].data(), images0[i].size() * sizeof(float));
+
+		Mat m1 = Mat(target_res, target_res, CV_32FC1);
+		memcpy(m1.data, images1[i].data(), images1[i].size() * sizeof(float));
+
+		Mat result;
+		addWeighted(m0, 1.0 - factor, m1, factor, 0.0, result);
+
+		vector<float> temp_image(target_res * target_res);
+		memcpy(&temp_image[0], result.data, temp_image.size() * sizeof(float));
+
+		temp_images.push_back(temp_image);
+	}
+	
+	return temp_images;
+}
+
+
+vector<float> opencv_downsize(const vector<float>& image, size_t res, size_t target_res)
+{
+	Mat m = Mat(res, res, CV_32FC1);
+	memcpy(m.data, image.data(), image.size() * sizeof(float));
+
+	float x = static_cast<float>(target_res) / res;
+
+	resize(m, m, cv::Size(), x, x, INTER_LINEAR);
+	vector<float> temp_image(target_res * target_res);
+	memcpy(&temp_image[0], m.data, temp_image.size() * sizeof(float));
+
+	return temp_image;
+}
+
+vector<float> opencv_resize(const vector<float>& image, size_t target_res)
+{
+	Mat m = Mat(2, 2, CV_32FC1);
+	memcpy(m.data, image.data(), image.size() * sizeof(float));
+
+	float x = static_cast<float>(target_res) / 2;
+
+	resize(m, m, cv::Size(), x, x, INTER_LINEAR);
+	vector<float> temp_image(target_res * target_res);
+	memcpy(&temp_image[0], m.data, temp_image.size() * sizeof(float));
+
+	return temp_image;
+}
+
+vector<float> resize_from_2by2(const vector<float>& image, size_t target_res)
+{
+	vector<float> temp_image(target_res * target_res, 0.0f);
+
+	const float upper_left = image[0];
+	const float upper_right = image[1];
+	const float lower_right = image[2];
+	const float lower_left = image[3];
+
+	for (size_t i = 0; i < target_res; i++)
+	{
+		for (size_t j = 0; j < target_res; j++)
+		{
+			size_t index = i * target_res + j;
+
+			if (i < target_res / 2)
+				if (j < target_res / 2)
+					temp_image[index] = upper_left;
+				else
+					temp_image[index] = upper_right;
+			else
+				if (j < target_res / 2)
+					temp_image[index] = lower_right;
+				else
+					temp_image[index] = lower_left;
+		}
+	}
+
+	return temp_image;
+}
+
+
+
+
+
+
+vector<vector<float>> get_data(size_t target_res)
+{
+	vector<vector<float>> images;
+
+	srand(1234);
+
+	inverse_width = 1.0f / template_width;
+	step_size = template_width / static_cast<float>(target_res - 1);
+	template_height = step_size * (target_res - 1);
+
+	train_points.clear();
+	line_segments.clear();
+	triangles.clear();
+	colours.clear();
+
+	train_points.resize(type_count);
+	line_segments.resize(type_count);
+	triangles.resize(type_count);
+	colours.resize(type_count);
+
+	for (size_t i = 0; i < colours.size(); i++)
+	{
+		colours[i].r = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+		colours[i].g = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+		colours[i].b = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+	}
+
+	for (size_t i = 0; i < type_count; i++)
+	{
+		for (size_t j = 0; j < 5; j++)
+		{
+			float x = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+			float y = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+
+			x -= 0.5f;
+			y -= 0.5f;
+			x *= template_width;
+			y *= template_width;
+
+			if (i == 0)
+			{
+				if (y < 0)
+				{
+					y = -y;
+				}
+			}
+			else
+			{
+				if (y > 0)
+				{
+					y = -y;
+				}
+			}
+
+
+			vertex_2 v;
+			v.x = x;
+			v.y = y;
+
+			train_points[i].push_back(v);
+		}
+	}
+
+
+
+
+	for (size_t i = 0; i < type_count; i++)
+	{
+		grid_x_min = -template_width * 0.5f;
+		grid_y_max = template_height * 0.5f;
+
+		// Generate geometric primitives using marching squares.
+		grid_square g;
+
+		float grid_x_pos = grid_x_min; // Start at minimum x.
+		float grid_y_pos = grid_y_max; // Start at maximum y.
+
+		vector<float> image(target_res * target_res, 0.0f);
+
+		// Begin march.
+		for (size_t y = 0; y < target_res; y++, grid_y_pos -= step_size, grid_x_pos = grid_x_min)
+			for (size_t x = 0; x < target_res; x++, grid_x_pos += step_size)
+				image[y * target_res + x] = get_value(i, vertex_2(grid_x_pos, grid_y_pos));
+
+		images.push_back(image);
+
+		//// Convolve image here...
+
+
+		//float_grayscale luma;
+		//luma.px = target_res;
+		//luma.py = target_res;
+
+		//luma.pixel_data = image;
+		//write_float_grayscale_to_tga("out0.tga", luma);
+
+		////image = opencv_blur(image, 100);
+		////luma.pixel_data = image;
+		////write_float_grayscale_to_tga("out1.tga", luma);
+
+		////image = opencv_blur(image, 150);
+		////luma.pixel_data = image;
+		////write_float_grayscale_to_tga("out2.tga", luma);
+
+
+
+
+
+
+
+
+		// Convert image to contours
+		grid_x_pos = grid_x_min; // Start at minimum x.
+		grid_y_pos = grid_y_max; // Start at maximum y.
+
+		// Begin march.
+		for (size_t y = 0; y < target_res - 1; y++, grid_y_pos -= step_size, grid_x_pos = grid_x_min)
+		{
+			for (size_t x = 0; x < target_res - 1; x++, grid_x_pos += step_size)
+			{
+				// Corner vertex order: 03
+				//                      12
+				// e.g.: clockwise, as in OpenGL
+				g.vertex[0] = vertex_2(grid_x_pos, grid_y_pos);
+				g.vertex[1] = vertex_2(grid_x_pos, grid_y_pos - step_size);
+				g.vertex[2] = vertex_2(grid_x_pos + step_size, grid_y_pos - step_size);
+				g.vertex[3] = vertex_2(grid_x_pos + step_size, grid_y_pos);
+
+				g.value[0] = image[y * target_res + x];
+				g.value[1] = image[(y + 1) * target_res + x];
+				g.value[2] = image[(y + 1) * target_res + (x + 1)];
+				g.value[3] = image[y * target_res + (x + 1)];
+
+				g.generate_primitives(line_segments[i], triangles[i], isovalue);
+			}
+		}
+	}
+
+	return images;
+}
+
+
+
+
+
+vector<vector<float>> get_data(const vector<vector<float>>&src_images, size_t target_res)
+{
+	vector<vector<float>> images;
+
+	srand(1234);
+
+	inverse_width = 1.0f / template_width;
+	step_size = template_width / static_cast<float>(target_res - 1);
+	template_height = step_size * (target_res - 1);
+
+	train_points.clear();
+	line_segments.clear();
+	triangles.clear();
+	colours.clear();
+
+	train_points.resize(type_count);
+	line_segments.resize(type_count);
+	triangles.resize(type_count);
+	colours.resize(type_count);
+
+	for (size_t i = 0; i < colours.size(); i++)
+	{
+		colours[i].r = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+		colours[i].g = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+		colours[i].b = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+	}
+
+	for (size_t i = 0; i < type_count; i++)
+	{
+		for (size_t j = 0; j < 5; j++)
+		{
+			float x = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+			float y = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+
+			x -= 0.5f;
+			y -= 0.5f;
+			x *= template_width;
+			y *= template_width;
+
+			if (i == 0)
+			{
+				if (y < 0)
+				{
+					y = -y;
+				}
+			}
+			else
+			{
+				if (y > 0)
+				{
+					y = -y;
+				}
+			}
+
+
+			vertex_2 v;
+			v.x = x;
+			v.y = y;
+
+			train_points[i].push_back(v);
+		}
+	}
+
+
+
+
+	for (size_t i = 0; i < type_count; i++)
+	{
+		grid_x_min = -template_width * 0.5f;
+		grid_y_max = template_height * 0.5f;
+
+		// Generate geometric primitives using marching squares.
+		grid_square g;
+
+		float grid_x_pos = grid_x_min; // Start at minimum x.
+		float grid_y_pos = grid_y_max; // Start at maximum y.
+
+		vector<float> image(target_res * target_res, 0.0f);
+
+		// Begin march.
+		for (size_t y = 0; y < target_res; y++, grid_y_pos -= step_size, grid_x_pos = grid_x_min)
+			for (size_t x = 0; x < target_res; x++, grid_x_pos += step_size)
+				image[y * target_res + x] = src_images[i][y * target_res + x];// get_value(i, vertex_2(grid_x_pos, grid_y_pos));
+
+		images.push_back(image);
+
+
+		// Convert image to contours
+		grid_x_pos = grid_x_min; // Start at minimum x.
+		grid_y_pos = grid_y_max; // Start at maximum y.
+
+		// Begin march.
+		for (size_t y = 0; y < target_res - 1; y++, grid_y_pos -= step_size, grid_x_pos = grid_x_min)
+		{
+			for (size_t x = 0; x < target_res - 1; x++, grid_x_pos += step_size)
+			{
+				// Corner vertex order: 03
+				//                      12
+				// e.g.: clockwise, as in OpenGL
+				g.vertex[0] = vertex_2(grid_x_pos, grid_y_pos);
+				g.vertex[1] = vertex_2(grid_x_pos, grid_y_pos - step_size);
+				g.vertex[2] = vertex_2(grid_x_pos + step_size, grid_y_pos - step_size);
+				g.vertex[3] = vertex_2(grid_x_pos + step_size, grid_y_pos);
+
+				g.value[0] = image[y * target_res + x];
+				g.value[1] = image[(y + 1) * target_res + x];
+				g.value[2] = image[(y + 1) * target_res + (x + 1)];
+				g.value[3] = image[y * target_res + (x + 1)];
+
+				g.generate_primitives(line_segments[i], triangles[i], isovalue);
+			}
+		}
+	}
+
+	return images;
+}
+
+
+
+
 
 #endif

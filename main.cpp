@@ -3,132 +3,48 @@
 // Cat image from: http://www.iacuc.arizona.edu/training/cats/index.html
 int main(int argc, char** argv)
 {
-	srand(1234);
+	//vector<vector<float>> two_by_two = get_data(2);
+	vector<vector<float>> res_by_res = get_data(marching_squares_resolution);
 
-	inverse_width = 1.0f / template_width;
-	step_size = template_width / static_cast<float>(marching_squares_resolution - 1);
-	template_height = step_size * (marching_squares_resolution - 1);
+	size_t target_res = 16;
 
-	train_points.clear();
-	line_segments.clear();
-	triangles.clear();
-	colours.clear();
+	for (size_t i = 0; i < res_by_res.size(); i++)
+		res_by_res[i] = opencv_downsize(res_by_res[i], marching_squares_resolution, target_res);
 
-	train_points.resize(type_count);
-	line_segments.resize(type_count);
-	triangles.resize(type_count);
-	colours.resize(type_count);
-
-	for (size_t i = 0; i < colours.size(); i++)
-	{
-		colours[i].r = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
-		colours[i].g = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
-		colours[i].b = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
-	}
-
-	for (size_t i = 0; i < type_count; i++)
-	{
-		for (size_t j = 0; j < 5; j++)
-		{
-			float x = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
-			float y = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
-
-			x -= 0.5f;
-			y -= 0.5f;
-			x *= template_width;
-			y *= template_width;
-
-
-			//if (i == 0)
-			//{
-			//	if (y < 0)
-			//	{
-			//		y = -y;
-			//	}
-			//}
-			//else
-			//{
-			//	if (y > 0)
-			//	{
-			//		y = -y;
-			//	}
-			//}
-					
-
-			vertex_2 v;
-			v.x = x;
-			v.y = y;
-
-			train_points[i].push_back(v);
-		}
-	}
+	res_by_res = get_data(res_by_res, target_res);
 
 
 
-
-	for (size_t i = 0; i < type_count; i++)
-	{
-		vector<float> image(marching_squares_resolution * marching_squares_resolution, 0.0f);
-
-		grid_x_min = -template_width * 0.5f;
-		grid_y_max = template_height * 0.5f;
-
-		// Generate geometric primitives using marching squares.
-		grid_square g;
-
-		float grid_x_pos = grid_x_min; // Start at minimum x.
-		float grid_y_pos = grid_y_max; // Start at maximum y.
-
-		// Begin march.
-		for (size_t y = 0; y < marching_squares_resolution; y++, grid_y_pos -= step_size, grid_x_pos = grid_x_min)
-			for (size_t x = 0; x < marching_squares_resolution; x++, grid_x_pos += step_size)
-				image[y * marching_squares_resolution + x] = get_value(i, vertex_2(grid_x_pos, grid_y_pos));
-
-		
-		
-		// Convolve image here...
+	//for (size_t i = 0; i < two_by_two.size(); i++)
+	//	//two_by_two[i] = resize_from_2by2(two_by_two[i], marching_squares_resolution);
+	//	two_by_two[i] = opencv_resize(two_by_two[i], marching_squares_resolution);
 
 
-		float_grayscale luma;
-		luma.px = marching_squares_resolution;
-		luma.py = marching_squares_resolution;
+//	vector<vector<float>> morphed_images = opencv_lerp(two_by_two, res_by_res, marching_squares_resolution, 1);
 
-		luma.pixel_data = image;
-		write_float_grayscale_to_tga("out0.tga", luma);
-			
-		//image = opencv_blur(image, 50);
-		luma.pixel_data = image;
-
-		write_float_grayscale_to_tga("out1.tga", luma);
+	//if(marching_squares_resolution == 2)
+	//	two_by_two = get_data(two_by_two, marching_squares_resolution);
+	//else
+	//	res_by_res = get_data(morphed_images, marching_squares_resolution);
 
 
 
-		// Convert image to contours
-		grid_x_pos = grid_x_min; // Start at minimum x.
-		grid_y_pos = grid_y_max; // Start at maximum y.
+	//float_grayscale luma;
 
-		// Begin march.
-		for (size_t y = 0; y < marching_squares_resolution - 1; y++, grid_y_pos -= step_size, grid_x_pos = grid_x_min)
-		{
-			for (size_t x = 0; x < marching_squares_resolution - 1; x++, grid_x_pos += step_size)
-			{
-				// Corner vertex order: 03
-				//                      12
-				// e.g.: clockwise, as in OpenGL
-				g.vertex[0] = vertex_2(grid_x_pos, grid_y_pos);
-				g.vertex[1] = vertex_2(grid_x_pos, grid_y_pos - step_size);
-				g.vertex[2] = vertex_2(grid_x_pos + step_size, grid_y_pos - step_size);
-				g.vertex[3] = vertex_2(grid_x_pos + step_size, grid_y_pos);
 
-				g.value[0] = image[y * marching_squares_resolution + x];
-				g.value[1] = image[(y + 1) * marching_squares_resolution + x];
-				g.value[2] = image[(y + 1) * marching_squares_resolution + (x + 1)];
-				g.value[3] = image[y * marching_squares_resolution + (x + 1)];
+	//luma.px = marching_squares_resolution;
+	//luma.py = marching_squares_resolution;
+	//luma.pixel_data = image;
+	//write_float_grayscale_to_tga("image.tga", luma);
 
-				g.generate_primitives(line_segments[i], triangles[i], isovalue);
-			}
-		}
-	}
+
+	//luma.px = marching_squares_resolution;
+	//luma.py = marching_squares_resolution;
+	//luma.pixel_data = image2;
+	//write_float_grayscale_to_tga("image2.tga", luma);
+
+
+
 
 	if (false == get_index(test_point_index))
 		test_point_index = get_closest_index(test_point);
@@ -423,7 +339,7 @@ void display_func(void)
 	glLineWidth(1);
 	glBegin(GL_LINES);
 
-	srand(1234);
+	//srand(1234);
 
 
 	// Draw contours
