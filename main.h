@@ -415,34 +415,11 @@ vector<float> opencv_sharpen(const vector<float>& image)
 
 
 
-vector<vector<float>> opencv_lerp(const vector<vector<float>> &images0, const vector<vector<float>>& images1, size_t target_res, double factor)
-{
-	vector<vector<float>> temp_images;
-
-	for (size_t i = 0; i < images0.size(); i++)
-	{
-		Mat m0 = Mat(target_res, target_res, CV_32FC1);
-		memcpy(m0.data, images0[i].data(), images0[i].size() * sizeof(float));
-
-		Mat m1 = Mat(target_res, target_res, CV_32FC1);
-		memcpy(m1.data, images1[i].data(), images1[i].size() * sizeof(float));
-
-		Mat result;
-		addWeighted(m0, 1.0 - factor, m1, factor, 0.0, result);
-
-		vector<float> temp_image(target_res * target_res);
-		memcpy(&temp_image[0], result.data, temp_image.size() * sizeof(float));
-
-		temp_images.push_back(temp_image);
-	}
-	
-	return temp_images;
-}
 
 
 vector<float> opencv_downsize(const vector<float>& image, size_t res, size_t target_res)
 {
-	Mat m = Mat(res, res, CV_32FC1);
+	Mat m = Mat(static_cast<int>(res), static_cast<int>(res), CV_32FC1);
 	memcpy(m.data, image.data(), image.size() * sizeof(float));
 
 	float x = static_cast<float>(target_res) / res;
@@ -453,52 +430,6 @@ vector<float> opencv_downsize(const vector<float>& image, size_t res, size_t tar
 
 	return temp_image;
 }
-
-vector<float> opencv_resize(const vector<float>& image, size_t target_res)
-{
-	Mat m = Mat(2, 2, CV_32FC1);
-	memcpy(m.data, image.data(), image.size() * sizeof(float));
-
-	float x = static_cast<float>(target_res) / 2;
-
-	resize(m, m, cv::Size(), x, x, INTER_LINEAR);
-	vector<float> temp_image(target_res * target_res);
-	memcpy(&temp_image[0], m.data, temp_image.size() * sizeof(float));
-
-	return temp_image;
-}
-
-vector<float> resize_from_2by2(const vector<float>& image, size_t target_res)
-{
-	vector<float> temp_image(target_res * target_res, 0.0f);
-
-	const float upper_left = image[0];
-	const float upper_right = image[1];
-	const float lower_right = image[2];
-	const float lower_left = image[3];
-
-	for (size_t i = 0; i < target_res; i++)
-	{
-		for (size_t j = 0; j < target_res; j++)
-		{
-			size_t index = i * target_res + j;
-
-			if (i < target_res / 2)
-				if (j < target_res / 2)
-					temp_image[index] = upper_left;
-				else
-					temp_image[index] = upper_right;
-			else
-				if (j < target_res / 2)
-					temp_image[index] = lower_right;
-				else
-					temp_image[index] = lower_left;
-		}
-	}
-
-	return temp_image;
-}
-
 
 
 
@@ -543,20 +474,20 @@ vector<vector<float>> get_data(size_t target_res)
 			x *= template_width;
 			y *= template_width;
 
-			if (i == 0)
-			{
-				if (y < 0)
-				{
-					y = -y;
-				}
-			}
-			else
-			{
-				if (y > 0)
-				{
-					y = -y;
-				}
-			}
+			//if (i == 0)
+			//{
+			//	if (y < 0)
+			//	{
+			//		y = -y;
+			//	}
+			//}
+			//else
+			//{
+			//	if (y > 0)
+			//	{
+			//		y = -y;
+			//	}
+			//}
 
 
 			vertex_2 v;
@@ -589,30 +520,6 @@ vector<vector<float>> get_data(size_t target_res)
 				image[y * target_res + x] = get_value(i, vertex_2(grid_x_pos, grid_y_pos));
 
 		images.push_back(image);
-
-		//// Convolve image here...
-
-
-		//float_grayscale luma;
-		//luma.px = target_res;
-		//luma.py = target_res;
-
-		//luma.pixel_data = image;
-		//write_float_grayscale_to_tga("out0.tga", luma);
-
-		////image = opencv_blur(image, 100);
-		////luma.pixel_data = image;
-		////write_float_grayscale_to_tga("out1.tga", luma);
-
-		////image = opencv_blur(image, 150);
-		////luma.pixel_data = image;
-		////write_float_grayscale_to_tga("out2.tga", luma);
-
-
-
-
-
-
 
 
 		// Convert image to contours
@@ -688,20 +595,20 @@ vector<vector<float>> get_data(const vector<vector<float>>&src_images, size_t ta
 			x *= template_width;
 			y *= template_width;
 
-			if (i == 0)
-			{
-				if (y < 0)
-				{
-					y = -y;
-				}
-			}
-			else
-			{
-				if (y > 0)
-				{
-					y = -y;
-				}
-			}
+			//if (i == 0)
+			//{
+			//	if (y < 0)
+			//	{
+			//		y = -y;
+			//	}
+			//}
+			//else
+			//{
+			//	if (y > 0)
+			//	{
+			//		y = -y;
+			//	}
+			//}
 
 
 			vertex_2 v;
