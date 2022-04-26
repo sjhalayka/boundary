@@ -3,14 +3,17 @@
 // Cat image from: http://www.iacuc.arizona.edu/training/cats/index.html
 int main(int argc, char** argv)
 {
+	//vector<vector<float>> res_by_res = get_data(marching_squares_resolution);
+
+	//size_t target_res = 2;
+
+	//for (size_t i = 0; i < res_by_res.size(); i++)
+	//	res_by_res[i] = opencv_downsize(res_by_res[i], marching_squares_resolution, target_res);
+
+	//res_by_res = get_data(res_by_res, target_res);
+
+
 	vector<vector<float>> res_by_res = get_data(marching_squares_resolution);
-
-	size_t target_res = 2;
-
-	for (size_t i = 0; i < res_by_res.size(); i++)
-		res_by_res[i] = opencv_downsize(res_by_res[i], marching_squares_resolution, target_res);
-
-	res_by_res = get_data(res_by_res, target_res);
 
 
 
